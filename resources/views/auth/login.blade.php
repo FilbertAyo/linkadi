@@ -48,7 +48,7 @@
         <div class="auth-wrapper v3">
             <div class="auth-form">
                 <div class="auth-header">
-                    <a href="#"><img src="images/linkadi2.png" alt="img" style="height: 40px;"></a>
+                    <a href="#"><img src="images/logo/linkadiblack.png" alt="img" style="height: 40px;"></a>
                 </div>
                 <div class="card my-5">
                     <div class="card-body">
@@ -116,7 +116,7 @@
                 <div class="auth-footer row">
                     <!-- <div class=""> -->
                     <div class="col my-1">
-                        <p class="m-0">Copyright © <a href="#">Codedthemes</a></p>
+                        <p class="m-0">Copyright © <a href="#">Soscom</a></p>
                     </div>
                     <div class="col-auto my-1">
                         <ul class="list-inline footer-link mb-0">
