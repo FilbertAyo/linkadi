@@ -1,11 +1,7 @@
 <x-app-layout>
 
+   
 
-
-
-    <div class="pc-container">
-      <div class="pc-content">
-        <!-- [ breadcrumb ] start -->
         <div class="page-header">
           <div class="page-block">
             <div class="row align-items-center">
@@ -24,9 +20,7 @@
             </div>
           </div>
         </div>
-        <!-- [ breadcrumb ] end -->
-
-        <!-- [ Main Content ] start -->
+      
         <div class="row">
         <div class="col-md-6 col-xl-3">
           <div class="card">
@@ -556,29 +550,6 @@
         </div>
         <!-- [ sample-page ] end -->
       </div>
-      <!-- [ Main Content ] end -->
-    </div>
-  </div>
-  <!-- [ Main Content ] end -->
-  <footer class="pc-footer">
-    <div class="footer-wrapper container-fluid">
-      <div class="row">
-        <div class="col-sm my-1">
-          <p class="m-0"
-            >Mantis &#9829; crafted by Team <a href="https://themeforest.net/user/Soscom" target="_blank">Soscom</a> Distributed by <a href="https://themewagon.com/">ThemeWagon</a>.</p
-          >
-        </div>
-        <div class="col-auto my-1">
-          <ul class="list-inline footer-link mb-0">
-            <li class="list-inline-item"><a href="../index.html">Home</a></li>
-            <li class="list-inline-item"><a href="https://Soscom.gitbook.io/mantis-bootstrap" target="_blank">Documentation</a></li>
-            <li class="list-inline-item"><a href="https://Soscom.authordesk.app/" target="_blank">Support</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-
+     
 
 </x-app-layout>

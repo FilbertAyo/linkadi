@@ -37,9 +37,36 @@
     @include('layouts.navigation')
     @include('layouts.aside')
 
+    <div class="pc-container">
+        <div class="pc-content">
+
+            {{ $slot }}
+
+        </div>
+    </div>
 
 
-    {{ $slot }}
+    <footer class="pc-footer">
+        <div class="footer-wrapper container-fluid">
+            <div class="row">
+                <div class="col-sm my-1">
+                    <p class="m-0">Linkadi crafted by Team <a href="https://themeforest.net/user/Soscom"
+                            target="_blank">Soscom</a> Distributed by <a href="https://Soscom.com/">Soscom</a>.
+                    </p>
+                </div>
+                <div class="col-auto my-1">
+                    <ul class="list-inline footer-link mb-0">
+                        <li class="list-inline-item"><a href="../index.html">Home</a></li>
+                        <li class="list-inline-item"><a href="https://Soscom.gitbook.io/Linkadi-bootstrap"
+                                target="_blank">Documentation</a></li>
+                        <li class="list-inline-item"><a href="https://Soscom.authordesk.app/"
+                                target="_blank">Support</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
 
     <script src="../assets/js/plugins/apexcharts.min.js"></script>
     <script src="../assets/js/pages/dashboard-analytics.js"></script>
@@ -51,21 +78,13 @@
     <script src="../assets/js/plugins/feather.min.js"></script>
 
 
-
-
-
     <script>
         layout_change('light');
     </script>
 
-
-
-
     <script>
         change_box_container('false');
     </script>
-
-
 
     <script>
         layout_rtl_change('false');
@@ -76,12 +95,9 @@
         preset_change("preset-1");
     </script>
 
-
     <script>
         font_change("Public-Sans");
     </script>
-
-
 
 </body>
 

@@ -48,7 +48,7 @@
         <div class="auth-wrapper v3">
             <div class="auth-form">
                 <div class="auth-header">
-                    <a href="#"><img src="images/logo/linkadiblack.png" alt="img" style="height: 40px;"></a>
+                    <a href="#"><img src="{{ asset('images/logo/linkadiblack.png') }}" alt="img" style="height: 40px;"></a>
                 </div>
                 <div class="card my-5">
                     <div class="card-body">
