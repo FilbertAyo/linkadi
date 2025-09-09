@@ -3,36 +3,6 @@
 
 @section('content')
 
-		<nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
-
-			<div class="container">
-				<a class="navbar-brand" href="index.html"><img src="images/linkadiwhite.png" alt="" style="height: 40px;"></a>
-
-				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-
-				<div class="collapse navbar-collapse" id="navbarsFurni">
-					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-						<li class="nav-item ">
-							<a class="nav-link" href="index.html">Home</a>
-						</li>
-						<li><a class="nav-link" href="shop.html">Shop</a></li>
-						<li><a class="nav-link" href="about.html">About us</a></li>
-						<li><a class="nav-link" href="services.html">Services</a></li>
-						<li><a class="nav-link" href="blog.html">Blog</a></li>
-						<li><a class="nav-link" href="contact.html">Contact us</a></li>
-					</ul>
-
-					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
-						<li><a class="nav-link" href="#"><img src="images/user.svg"></a></li>
-						<li><a class="nav-link" href="cart.html"><img src="images/cart.svg"></a></li>
-					</ul>
-				</div>
-			</div>
-
-		</nav>
-		<!-- End Header/Navigation -->
 
 		<!-- Start Hero Section -->
 			<div class="hero">
@@ -70,53 +40,41 @@
                         </tr>
                       </thead>
                       <tbody>
+                      @php($subtotal = 0)
+                      @forelse(($cart ?? []) as $item)
+                        @php($line = $item['price'] * $item['quantity'])
+                        @php($subtotal += $line)
                         <tr>
                           <td class="product-thumbnail">
-                            <img src="images/product-1.png" alt="Image" class="img-fluid">
+                            <img src="{{ $item['image_url'] }}" alt="Image" class="img-fluid">
                           </td>
                           <td class="product-name">
-                            <h2 class="h5 text-black">Product 1</h2>
+                            <h2 class="h5 text-black">{{ $item['name'] }}</h2>
                           </td>
-                          <td>$49.00</td>
+                          <td>${{ number_format($item['price'], 2) }}</td>
                           <td>
-                            <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
-                              <div class="input-group-prepend">
-                                <button class="btn btn-outline-black decrease" type="button">&minus;</button>
+                            <form method="POST" action="{{ route('cart.update', $item['id']) }}">
+                              @csrf
+                              <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 180px;">
+                                <input type="number" name="quantity" min="0" class="form-control text-center quantity-amount js-qty" value="{{ $item['quantity'] }}" aria-label="Quantity" data-price="{{ number_format($item['price'], 2, '.', '') }}" data-line-target="#line-{{ $item['id'] }}" data-subtotal-target="#subtotal-value">
+                                <button class="btn btn-outline-black" type="submit">Update</button>
                               </div>
-                              <input type="text" class="form-control text-center quantity-amount" value="1" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
-                              <div class="input-group-append">
-                                <button class="btn btn-outline-black increase" type="button">&plus;</button>
-                              </div>
-                            </div>
-
+                            </form>
                           </td>
-                          <td>$49.00</td>
-                          <td><a href="#" class="btn btn-black btn-sm">X</a></td>
+                          <td id="line-{{ $item['id'] }}">${{ number_format($line, 2) }}</td>
+                          <td>
+                            <form method="POST" action="{{ route('cart.remove', $item['id']) }}">
+                              @csrf
+                              @method('DELETE')
+                              <button type="submit" class="btn btn-black btn-sm">X</button>
+                            </form>
+                          </td>
                         </tr>
-
+                      @empty
                         <tr>
-                          <td class="product-thumbnail">
-                            <img src="images/product-2.png" alt="Image" class="img-fluid">
-                          </td>
-                          <td class="product-name">
-                            <h2 class="h5 text-black">Product 2</h2>
-                          </td>
-                          <td>$49.00</td>
-                          <td>
-                            <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
-                              <div class="input-group-prepend">
-                                <button class="btn btn-outline-black decrease" type="button">&minus;</button>
-                              </div>
-                              <input type="text" class="form-control text-center quantity-amount" value="1" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
-                              <div class="input-group-append">
-                                <button class="btn btn-outline-black increase" type="button">&plus;</button>
-                              </div>
-                            </div>
-
-                          </td>
-                          <td>$49.00</td>
-                          <td><a href="#" class="btn btn-black btn-sm">X</a></td>
+                          <td colspan="6" class="text-center">Your cart is empty.</td>
                         </tr>
+                      @endforelse
                       </tbody>
                     </table>
                   </div>
@@ -159,7 +117,7 @@
                           <span class="text-black">Subtotal</span>
                         </div>
                         <div class="col-md-6 text-right">
-                          <strong class="text-black">$230.00</strong>
+                          <strong class="text-black" id="subtotal-value">${{ number_format($subtotal, 2) }}</strong>
                         </div>
                       </div>
                       <div class="row mb-5">
@@ -167,13 +125,13 @@
                           <span class="text-black">Total</span>
                         </div>
                         <div class="col-md-6 text-right">
-                          <strong class="text-black">$230.00</strong>
+                          <strong class="text-black">${{ number_format($subtotal, 2) }}</strong>
                         </div>
                       </div>
 
                       <div class="row">
                         <div class="col-md-12">
-                          <button class="btn btn-black btn-lg py-3 btn-block" onclick="window.location='checkout.html'">Proceed To Checkout</button>
+                          <a class="btn btn-black btn-lg py-3 btn-block" href="{{ route('cart.checkout') }}">Proceed To Checkout</a>
                         </div>
                       </div>
                     </div>
@@ -185,3 +143,34 @@
 
 
 		@endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const qtyInputs = document.querySelectorAll('.js-qty');
+  function recalcSubtotal() {
+    let subtotal = 0;
+    document.querySelectorAll('[id^="line-"]').forEach(function (el) {
+      const value = parseFloat(String(el.textContent).replace(/[^0-9.\-]/g, '')) || 0;
+      subtotal += value;
+    });
+    const subtotalEl = document.querySelector('#subtotal-value');
+    if (subtotalEl) {
+      subtotalEl.textContent = '$' + subtotal.toFixed(2);
+    }
+  }
+  qtyInputs.forEach(function (input) {
+    input.addEventListener('input', function () {
+      const price = parseFloat(input.dataset.price || '0');
+      const qty = Math.max(0, parseInt(input.value || '0', 10));
+      const lineTarget = document.querySelector(input.dataset.lineTarget);
+      if (lineTarget) {
+        const line = price * qty;
+        lineTarget.textContent = '$' + line.toFixed(2);
+      }
+      recalcSubtotal();
+    });
+  });
+});
+</script>
+@endpush

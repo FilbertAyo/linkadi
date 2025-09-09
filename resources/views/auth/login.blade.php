@@ -44,9 +44,7 @@
         </div>
     </form> --}}
 
-    <div class="auth-main ">
-        <div class="auth-wrapper v3">
-            <div class="auth-form">
+
                 <div class="auth-header">
                     <a href="#"><img src="{{ asset('images/logo/linkadiblack.png') }}" alt="img" style="height: 40px;"></a>
                 </div>
@@ -86,7 +84,7 @@
                             <span>Login with</span>
                         </div>
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-12">
                                 <div class="d-grid">
                                     <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
                                         <img src="../assets/images/authentication/google.svg" alt="img"> <span
@@ -94,41 +92,10 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <div class="d-grid">
-                                    <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
-                                        <img src="../assets/images/authentication/twitter.svg" alt="img"> <span
-                                            class="d-none d-sm-inline-block"> Twitter</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="d-grid">
-                                    <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
-                                        <img src="../assets/images/authentication/facebook.svg" alt="img"> <span
-                                            class="d-none d-sm-inline-block"> Facebook</span>
-                                    </button>
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                 </div>
-                <div class="auth-footer row">
-                    <!-- <div class=""> -->
-                    <div class="col my-1">
-                        <p class="m-0">Copyright © <a href="#">Soscom</a></p>
-                    </div>
-                    <div class="col-auto my-1">
-                        <ul class="list-inline footer-link mb-0">
-                            <li class="list-inline-item"><a href="#">Home</a></li>
-                            <li class="list-inline-item"><a href="#">Privacy Policy</a></li>
-                            <li class="list-inline-item"><a href="#">Contact us</a></li>
-                        </ul>
-                    </div>
-                    <!-- </div> -->
-                </div>
-            </div>
-        </div>
-    </div>
+
 
 </x-guest-layout>

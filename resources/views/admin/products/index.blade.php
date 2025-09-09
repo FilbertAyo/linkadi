@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    
+
     <div class="row">
         <div class="col-md-12 col-xl-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -59,12 +59,12 @@
                                 <tr>
                                     <td>
                                         @if($product->mainImage)
-                                            <img src="{{ asset('storage/' . $product->mainImage->image_path) }}" 
-                                                 alt="{{ $product->name }}" 
-                                                 class="rounded" 
+                                            <img src="{{ asset('storage/' . $product->mainImage->image_path) }}"
+                                                 alt="{{ $product->name }}"
+                                                 class="rounded"
                                                  style="width: 50px; height: 50px; object-fit: cover;">
                                         @else
-                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center"
                                                  style="width: 50px; height: 50px;">
                                                 <i class="fas fa-image text-muted"></i>
                                             </div>
@@ -107,26 +107,26 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
-                                           
-                                            <a href="{{ route('products.edit', $product) }}" 
-                                               class="btn btn-sm btn-outline-primary" 
-                                               title="Edit">
+                                        
+                                            <a href="{{ route('products.edit', $product) }}"
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="Update">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form method="POST" 
-                                                  action="{{ route('products.toggle-status', $product) }}" 
+                                            <form method="POST"
+                                                  action="{{ route('products.toggle-status', $product) }}"
                                                   class="d-inline">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button type="submit" 
-                                                        class="btn btn-sm btn-outline-{{ $product->is_active ? 'warning' : 'success' }}" 
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-{{ $product->is_active ? 'warning' : 'success' }}"
                                                         title="{{ $product->is_active ? 'Deactivate' : 'Activate' }}">
                                                     <i class="fas fa-{{ $product->is_active ? 'pause' : 'play' }}"></i>
                                                 </button>
                                             </form>
-                                            <button type="button" 
-                                                    class="btn btn-sm btn-outline-danger" 
-                                                    data-bs-toggle="modal" 
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    data-bs-toggle="modal"
                                                     data-bs-target="#deleteModal{{ $product->id }}"
                                                     title="Delete">
                                                 <i class="fas fa-trash"></i>
@@ -170,7 +170,7 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     @if($products->hasPages())
                         <div class="mt-3">
                             {{ $products->links() }}

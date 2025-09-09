@@ -38,47 +38,22 @@
                 </div>
                 <!-- End Column 1 -->
 
-                <!-- Start Column 2 -->
+                @foreach($products as $product)
                 <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-                    <a class="product-item" href="cart.html">
-                        <img src="images/product-1.png" class="img-fluid product-thumbnail">
-                        <h3 class="product-title">Nordic Chair</h3>
-                        <strong class="product-price">$50.00</strong>
-
-                        <span class="icon-cross">
-                            <img src="images/cross.svg" class="img-fluid">
-                        </span>
-                    </a>
+                    <div class="product-item">
+                        <a href="{{ route('product.show', $product) }}">
+                            <img src="{{ $product->mainImage ? Storage::url($product->mainImage->image_path) : asset('images/product-1.png') }}" class="img-fluid product-thumbnail">
+                            <h3 class="product-title">{{ $product->name }}</h3>
+                            <strong class="product-price">${{ number_format($product->price, 2) }}</strong>
+                        </a>
+                        <form method="POST" action="{{ route('cart.add', $product) }}" class="mt-2">
+                            @csrf
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-sm btn-black">Add to Cart</button>
+                        </form>
+                    </div>
                 </div>
-                <!-- End Column 2 -->
-
-                <!-- Start Column 3 -->
-                <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-                    <a class="product-item" href="cart.html">
-                        <img src="images/product-2.png" class="img-fluid product-thumbnail">
-                        <h3 class="product-title">Kruzo Aero Chair</h3>
-                        <strong class="product-price">$78.00</strong>
-
-                        <span class="icon-cross">
-                            <img src="images/cross.svg" class="img-fluid">
-                        </span>
-                    </a>
-                </div>
-                <!-- End Column 3 -->
-
-                <!-- Start Column 4 -->
-                <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-                    <a class="product-item" href="cart.html">
-                        <img src="images/product-3.png" class="img-fluid product-thumbnail">
-                        <h3 class="product-title">Ergonomic Chair</h3>
-                        <strong class="product-price">$43.00</strong>
-
-                        <span class="icon-cross">
-                            <img src="images/cross.svg" class="img-fluid">
-                        </span>
-                    </a>
-                </div>
-                <!-- End Column 4 -->
+                @endforeach
 
             </div>
         </div>

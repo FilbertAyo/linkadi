@@ -1,12 +1,29 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Product;
+// (duplicate import removed)
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\SocialAuthController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
+
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+
+// Public product browsing
+Route::get('/shop', [HomeController::class, 'shop'])->name('shop');
+Route::get('/product/{product}', [HomeController::class, 'product'])->name('product.show');
+
+// Session cart
+Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update/{product}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
+Route::get('/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+
+Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -29,3 +46,7 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+// Google OAuth
+Route::get('/auth/google/redirect', [SocialAuthController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('google.callback');

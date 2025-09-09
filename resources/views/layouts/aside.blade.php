@@ -71,7 +71,7 @@
             </ul>
             <div class="card text-center">
                 <div class="card-body">
-                    <img src="../assets/images/img-navbar-card.png" alt="images" class="img-fluid mb-2">
+                    <img src="{{ asset('assets/images/img-navbar-card.png') }}" alt="images" class="img-fluid mb-2">
                     <h5>Help?</h5>
                     <p>Get to resolve query</p>
                     <button class="btn btn-success">Support</button>

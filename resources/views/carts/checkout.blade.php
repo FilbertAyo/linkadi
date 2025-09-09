@@ -274,21 +274,22 @@
 		                    <th>Total</th>
 		                  </thead>
 		                  <tbody>
-		                    <tr>
-		                      <td>Top Up T-Shirt <strong class="mx-2">x</strong> 1</td>
-		                      <td>$250.00</td>
-		                    </tr>
-		                    <tr>
-		                      <td>Polo Shirt <strong class="mx-2">x</strong>   1</td>
-		                      <td>$100.00</td>
-		                    </tr>
+		                    @php($subtotal = 0)
+		                    @foreach(($cart ?? []) as $item)
+		                      @php($line = $item['price'] * $item['quantity'])
+		                      @php($subtotal += $line)
+		                      <tr>
+		                        <td>{{ $item['name'] }} <strong class="mx-2">x</strong> {{ $item['quantity'] }}</td>
+		                        <td>${{ number_format($line, 2) }}</td>
+		                      </tr>
+		                    @endforeach
 		                    <tr>
 		                      <td class="text-black font-weight-bold"><strong>Cart Subtotal</strong></td>
-		                      <td class="text-black">$350.00</td>
+		                      <td class="text-black">${{ number_format($subtotal, 2) }}</td>
 		                    </tr>
 		                    <tr>
 		                      <td class="text-black font-weight-bold"><strong>Order Total</strong></td>
-		                      <td class="text-black font-weight-bold"><strong>$350.00</strong></td>
+		                      <td class="text-black font-weight-bold"><strong>${{ number_format($subtotal, 2) }}</strong></td>
 		                    </tr>
 		                  </tbody>
 		                </table>
@@ -324,7 +325,7 @@
 		                </div>
 
 		                <div class="form-group">
-		                  <button class="btn btn-black btn-lg py-3 btn-block" onclick="window.location='thankyou.html'">Place Order</button>
+		                  <button class="btn btn-black btn-lg py-3 btn-block" type="button">Place Order</button>
 		                </div>
 
 		              </div>
