@@ -1,0 +1,80 @@
+<?php
+
+use Illuminate\Support\Facades\Password;
+use Livewire\Attributes\Layout;
+use Livewire\Volt\Component;
+
+new #[Layout('layouts.guest')] class extends Component
+{
+    public string $email = '';
+
+    /**
+     * Send a password reset link to the provided email address.
+     */
+    public function sendPasswordResetLink(): void
+    {
+        $this->validate([
+            'email' => ['required', 'string', 'email'],
+        ]);
+
+        // We will send the password reset link to this user. Once we have attempted
+        // to send the link, we will examine the response then see the message we
+        // need to show to the user. Finally, we'll send out a proper response.
+        $status = Password::sendResetLink(
+            $this->only('email')
+        );
+
+        if ($status != Password::RESET_LINK_SENT) {
+            $this->addError('email', __($status));
+
+            return;
+        }
+
+        $this->reset('email');
+
+        session()->flash('status', __($status));
+    }
+}; ?>
+
+<div>
+    <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
+        Reset your password
+    </h2>
+
+    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+    </div>
+
+    <!-- Session Status -->
+    @if (session('status'))
+        <div class="mb-4 text-sm text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400 p-3 rounded-lg">
+            {{ session('status') }}
+        </div>
+    @endif
+
+    <form wire:submit="sendPasswordResetLink" class="mt-8 space-y-6">
+        <!-- Email Address -->
+        <div>
+            <label for="email" class="text-sm font-medium text-gray-900 dark:text-white block mb-2">Your email</label>
+            <input wire:model="email" 
+                   id="email" 
+                   type="email" 
+                   name="email" 
+                   class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white sm:text-sm rounded-lg focus:ring-brand-600 focus:border-brand-600 dark:focus:ring-brand-500 dark:focus:border-brand-500 block w-full p-2.5" 
+                   placeholder="name@company.com" 
+                   required 
+                   autofocus>
+            @error('email')
+                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <button type="submit" class="text-white bg-brand-600 hover:bg-brand-700 dark:bg-brand-600 dark:hover:bg-brand-600 focus:ring-4 focus:ring-brand-200 dark:focus:ring-brand-700 font-medium rounded-lg text-base px-5 py-3 w-full sm:w-auto text-center">
+            Email Password Reset Link
+        </button>
+
+        <div class="text-sm font-medium text-gray-500 dark:text-gray-400">
+            Remember your password? <a href="{{ route('login') }}" class="text-brand-600 dark:text-brand-400 hover:underline" wire:navigate>Login here</a>
+        </div>
+    </form>
+</div>
