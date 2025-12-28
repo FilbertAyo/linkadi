@@ -84,6 +84,70 @@
                     </div>
                 @endif
             </div>
+
+            <!-- Packages Section -->
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6 xl:p-8 border border-gray-200 dark:border-gray-700">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Available Packages</h3>
+                    <p class="text-base font-normal text-gray-500 dark:text-gray-400">Choose your NFC card package</p>
+                </div>
+
+                @if($packages->isEmpty())
+                    <div class="text-center py-8">
+                        <p class="text-gray-500 dark:text-gray-400">No packages available at the moment.</p>
+                    </div>
+                @else
+                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        @foreach($packages as $package)
+                            <div class="flex flex-col p-6 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                                @if($package->image)
+                                    <img src="{{ $package->image_url }}" alt="{{ $package->name }}" class="w-full h-40 object-cover rounded-lg mb-4">
+                                @else
+                                    <div class="w-full h-40 bg-indigo-100 dark:bg-indigo-900 rounded-lg mb-4 flex items-center justify-center">
+                                        <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-300">{{ substr($package->name, 0, 2) }}</span>
+                                    </div>
+                                @endif
+
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ $package->name }}</h4>
+                                
+                                @if($package->description)
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{{ Str::limit($package->description, 80) }}</p>
+                                @endif
+
+                                <div class="mb-4">
+                                    @if($package->type === 'classic')
+                                        @if($package->pricingTiers->isNotEmpty())
+                                            <span class="text-2xl font-bold text-gray-900 dark:text-white">From ${{ number_format($package->pricingTiers->first()->price_per_unit, 2) }}</span>
+                                            <span class="text-gray-500 dark:text-gray-400">/card</span>
+                                        @endif
+                                    @else
+                                        <span class="text-2xl font-bold text-gray-900 dark:text-white">${{ number_format($package->base_price ?? 0, 2) }}</span>
+                                    @endif
+                                </div>
+
+                                @if($package->features && count($package->features) > 0)
+                                    <ul class="mb-4 space-y-2">
+                                        @foreach(array_slice($package->features, 0, 3) as $feature)
+                                            <li class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                {{ $feature }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+
+                                <div class="mt-auto pt-4">
+                                    <a href="{{ route('packages.show', $package->slug) }}" class="block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 </x-dashboard-layout>
