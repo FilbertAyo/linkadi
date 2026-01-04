@@ -35,12 +35,12 @@
                         </div>
                         <div class="flex justify-between">
                             <dt class="text-gray-600 dark:text-gray-400">Unit Price:</dt>
-                            <dd class="text-gray-900 dark:text-white font-medium">${{ number_format($order->unit_price, 2) }}</dd>
+                            <dd class="text-gray-900 dark:text-white font-medium">TZS {{ number_format($order->unit_price, 2) }}</dd>
                         </div>
                         <hr class="border-gray-200 dark:border-gray-700">
                         <div class="flex justify-between">
                             <dt class="text-lg font-semibold text-gray-900 dark:text-white">Total:</dt>
-                            <dd class="text-lg font-bold text-indigo-600 dark:text-indigo-400">${{ number_format($order->total_price, 2) }}</dd>
+                            <dd class="text-lg font-bold text-indigo-600 dark:text-indigo-400">TZS {{ number_format($order->total_price, 2) }}</dd>
                         </div>
                     </dl>
                 </div>

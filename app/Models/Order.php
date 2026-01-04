@@ -17,10 +17,15 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'package_id',
+        'profile_id',
         'quantity',
         'unit_price',
         'total_price',
         'status',
+        'payment_status',
+        'payment_method',
+        'payment_reference',
+        'paid_at',
         'shipping_address',
         'notes',
     ];
@@ -37,6 +42,8 @@ class Order extends Model
             'unit_price' => 'decimal:2',
             'total_price' => 'decimal:2',
             'status' => 'string',
+            'payment_status' => 'string',
+            'paid_at' => 'datetime',
         ];
     }
 
@@ -54,6 +61,14 @@ class Order extends Model
     public function package(): BelongsTo
     {
         return $this->belongsTo(Package::class);
+    }
+
+    /**
+     * Get the profile for this order.
+     */
+    public function profile(): BelongsTo
+    {
+        return $this->belongsTo(Profile::class);
     }
 
     /**
@@ -94,5 +109,91 @@ class Order extends Model
     public function isCancelled(): bool
     {
         return $this->status === 'cancelled';
+    }
+
+    /**
+     * Check if payment is pending.
+     */
+    public function isPaymentPending(): bool
+    {
+        return $this->payment_status === 'pending';
+    }
+
+    /**
+     * Check if payment is completed.
+     */
+    public function isPaymentPaid(): bool
+    {
+        return $this->payment_status === 'paid';
+    }
+
+    /**
+     * Check if payment failed.
+     */
+    public function isPaymentFailed(): bool
+    {
+        return $this->payment_status === 'failed';
+    }
+
+    /**
+     * Check if payment was refunded.
+     */
+    public function isPaymentRefunded(): bool
+    {
+        return $this->payment_status === 'refunded';
+    }
+
+    /**
+     * Check if payment was cancelled.
+     */
+    public function isPaymentCancelled(): bool
+    {
+        return $this->payment_status === 'cancelled';
+    }
+
+    /**
+     * Get the payment status badge color.
+     */
+    public function getPaymentStatusBadgeColorAttribute(): string
+    {
+        return match($this->payment_status) {
+            'pending' => 'yellow',
+            'paid' => 'green',
+            'failed' => 'red',
+            'refunded' => 'orange',
+            'cancelled' => 'gray',
+            default => 'gray',
+        };
+    }
+
+    /**
+     * Get the payment status display name.
+     */
+    public function getPaymentStatusDisplayAttribute(): string
+    {
+        return match($this->payment_status) {
+            'pending' => 'Pending Payment',
+            'paid' => 'Paid',
+            'failed' => 'Payment Failed',
+            'refunded' => 'Refunded',
+            'cancelled' => 'Cancelled',
+            default => ucfirst($this->payment_status),
+        };
+    }
+
+    /**
+     * Scope a query to only include paid orders.
+     */
+    public function scopePaid($query)
+    {
+        return $query->where('payment_status', 'paid');
+    }
+
+    /**
+     * Scope a query to only include pending payment orders.
+     */
+    public function scopePendingPayment($query)
+    {
+        return $query->where('payment_status', 'pending');
     }
 }

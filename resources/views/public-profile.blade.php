@@ -63,17 +63,41 @@
 
                         <!-- Profile Info -->
                         <div class="flex-1">
-                            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                                {{ $profile->user->name }}
-                            </h1>
-                            @if($profile->title || $profile->company)
+                            <div class="flex items-center gap-2 mb-2">
+                                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                                    {{ $profile->display_name }}
+                                </h1>
+                                @if($profile->isBusiness())
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                        Business
+                                    </span>
+                                @endif
+                            </div>
+                            @if($profile->subtitle)
                                 <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">
-                                    @if($profile->title){{ $profile->title }}@endif
-                                    @if($profile->title && $profile->company) at @endif
-                                    @if($profile->company)<span class="font-semibold">{{ $profile->company }}</span>@endif
+                                    {{ $profile->subtitle }}
+                                </p>
+                            @endif
+                            @if($profile->isBusiness() && $profile->tax_id)
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    Tax ID: {{ $profile->tax_id }}
                                 </p>
                             @endif
                         </div>
+                    </div>
+                    
+                    <!-- Add to Contacts Button -->
+                    <div class="mt-6">
+                        <a href="{{ route('profile.vcard', $profile->slug) }}" 
+                           class="w-full inline-flex items-center justify-center gap-3 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold shadow-lg hover:shadow-xl transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <span>Save to Contacts</span>
+                        </a>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+                            Download contact card (.vcf) - Works on all devices
+                        </p>
                     </div>
                 </div>
 
@@ -86,31 +110,39 @@
                 @endif
 
                 <!-- Contact Information -->
-                @if($profile->phone || $profile->email || $profile->website || $profile->address)
+                @php
+                    $publicContacts = $profile->contacts()->public()->get();
+                    $phones = $publicContacts->where('type', 'phone');
+                    $emails = $publicContacts->where('type', 'email');
+                @endphp
+                
+                @if($phones->isNotEmpty() || $emails->isNotEmpty() || $profile->website || $profile->address)
                 <div class="px-6 sm:px-8 pb-6 border-t border-gray-200 dark:border-gray-700 pt-6">
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Contact Information</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @if($profile->phone)
+                        @foreach($phones as $phone)
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                            </svg>
-                            <a href="tel:{{ $profile->phone }}" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
-                                {{ $profile->phone }}
-                            </a>
+                            <span class="text-lg">{{ $phone->icon }}</span>
+                            <div class="flex-1">
+                                <a href="tel:{{ $phone->value }}" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
+                                    {{ $phone->value }}
+                                </a>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $phone->display_label }}</p>
+                            </div>
                         </div>
-                        @endif
+                        @endforeach
 
-                        @if($profile->email)
+                        @foreach($emails as $email)
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                            </svg>
-                            <a href="mailto:{{ $profile->email }}" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
-                                {{ $profile->email }}
-                            </a>
+                            <span class="text-lg">{{ $email->icon }}</span>
+                            <div class="flex-1">
+                                <a href="mailto:{{ $email->value }}" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 break-all">
+                                    {{ $email->value }}
+                                </a>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $email->display_label }}</p>
+                            </div>
                         </div>
-                        @endif
+                        @endforeach
 
                         @if($profile->website)
                         <div class="flex items-center gap-3">

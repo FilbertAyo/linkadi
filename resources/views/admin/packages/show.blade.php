@@ -56,7 +56,7 @@
                         @if(in_array($package->type, ['nfc_plain', 'nfc_printed']))
                             <div>
                                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Base Price</dt>
-                                <dd class="mt-1 text-sm text-gray-900 dark:text-white">${{ number_format($package->base_price ?? 0, 2) }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900 dark:text-white">TZS {{ number_format($package->base_price ?? 0, 2) }}</dd>
                             </div>
                         @endif
                     </dl>
@@ -101,7 +101,7 @@
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $tier->min_quantity }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $tier->max_quantity ?? 'Unlimited' }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ number_format($tier->price_per_unit, 2) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">TZS {{ number_format($tier->price_per_unit, 2) }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="px-2 py-1 text-xs font-medium rounded-full {{ $tier->is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' }}">
                                                     {{ $tier->is_active ? 'Active' : 'Inactive' }}
@@ -137,7 +137,7 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">#{{ $order->id }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $order->user->name }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $order->quantity }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ number_format($order->total_price, 2) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">TZS {{ number_format($order->total_price, 2) }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="px-2 py-1 text-xs font-medium rounded-full 
                                                     {{ $order->status === 'delivered' ? 'bg-green-100 text-green-800' : '' }}

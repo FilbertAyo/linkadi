@@ -176,11 +176,11 @@
                             <div class="flex justify-center items-baseline my-8">
                                 @if($package->type === 'classic')
                                     @if($package->pricingTiers->isNotEmpty())
-                                        <span class="mr-2 text-4xl font-extrabold">From ${{ number_format($package->pricingTiers->first()->price_per_unit, 2) }}</span>
+                                        <span class="mr-2 text-4xl font-extrabold">From TZS {{ number_format($package->pricingTiers->first()->price_per_unit, 2) }}</span>
                                         <span class="text-gray-500 dark:text-gray-400">/card</span>
                                     @endif
                                 @else
-                                    <span class="mr-2 text-4xl font-extrabold">${{ number_format($package->base_price ?? 0, 2) }}</span>
+                                    <span class="mr-2 text-4xl font-extrabold">TZS {{ number_format($package->base_price ?? 0, 2) }}</span>
                                 @endif
                             </div>
                             

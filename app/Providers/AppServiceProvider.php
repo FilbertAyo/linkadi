@@ -32,5 +32,16 @@ class AppServiceProvider extends ServiceProvider
                 $profile->save();
             }
         });
+
+        // Make asset URLs work with network access (0.0.0.0)
+        // This ensures assets work when accessing via network IP on mobile devices
+        if (app()->runningInConsole() === false && request()->server('HTTP_HOST')) {
+            $scheme = request()->getScheme();
+            $host = request()->getHttpHost();
+            $baseUrl = "{$scheme}://{$host}";
+            config(['app.url' => $baseUrl]);
+            // Also update storage URL for dynamic asset generation
+            config(['filesystems.disks.public.url' => "{$baseUrl}/storage"]);
+        }
     }
 }

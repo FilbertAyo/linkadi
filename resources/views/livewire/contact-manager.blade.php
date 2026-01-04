@@ -1,0 +1,177 @@
+<div>
+    <div class="mb-4 flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Contact Information</h3>
+        @if(!$showAddForm)
+            <button wire:click="addContact" type="button" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm">
+                + Add Contact
+            </button>
+        @endif
+    </div>
+
+    <!-- Add/Edit Form -->
+    @if($showAddForm)
+        <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+            <h4 class="text-md font-semibold text-gray-900 dark:text-white mb-4">
+                {{ $editingId ? 'Edit Contact' : 'Add New Contact' }}
+            </h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Type</label>
+                    <select wire:model.live="type" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white" {{ $editingId ? 'disabled' : '' }}>
+                        <option value="phone">📞 Phone</option>
+                        <option value="email">✉️ Email</option>
+                    </select>
+                    @error('type') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Category -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
+                    <select wire:model.live="category" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                        <option value="main">Main</option>
+                        <option value="work">Work</option>
+                        <option value="home">Home</option>
+                        @if($type === 'phone')
+                            <option value="mobile">Mobile</option>
+                        @endif
+                        <option value="custom">Custom</option>
+                    </select>
+                    @error('category') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Value -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {{ $type === 'phone' ? 'Phone Number' : 'Email Address' }}
+                    </label>
+                    <input 
+                        type="{{ $type === 'phone' ? 'tel' : 'email' }}" 
+                        wire:model="value" 
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        placeholder="{{ $type === 'phone' ? '+1234567890' : 'email@example.com' }}"
+                    />
+                    @error('value') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Custom Label (if category is custom) -->
+                @if($category === 'custom')
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Custom Label</label>
+                        <input 
+                            type="text" 
+                            wire:model="custom_label" 
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                            placeholder="e.g., Emergency, Support"
+                        />
+                        @error('custom_label') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                    </div>
+                @endif
+            </div>
+
+            <!-- Checkboxes -->
+            <div class="mt-4 flex gap-6">
+                <label class="flex items-center">
+                    <input type="checkbox" wire:model="is_primary" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Set as primary</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="checkbox" wire:model="is_public" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Show on public profile</span>
+                </label>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-4 flex gap-2">
+                <button wire:click="saveContact" type="button" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    {{ $editingId ? 'Update' : 'Save' }}
+                </button>
+                <button wire:click="cancelAdd" type="button" class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    @endif
+
+    <!-- Contacts List -->
+    <div class="space-y-4">
+        <!-- Phone Numbers -->
+        @php $phones = collect($contacts)->where('type', 'phone'); @endphp
+        @if($phones->isNotEmpty())
+            <div>
+                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">📞 Phone Numbers</h4>
+                <div class="space-y-2">
+                    @foreach($phones as $contact)
+                        <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $contact['value'] }}</span>
+                                    @if($contact['is_primary'])
+                                        <span class="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full">Primary</span>
+                                    @endif
+                                    @if(!$contact['is_public'])
+                                        <span class="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 rounded-full">Private</span>
+                                    @endif
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    {{ $contact['category'] === 'custom' ? $contact['custom_label'] : ucfirst($contact['category']) }}
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                @if(!$contact['is_primary'])
+                                    <button wire:click="setPrimary({{ $contact['id'] }})" type="button" class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400">Set Primary</button>
+                                @endif
+                                <button wire:click="moveUp({{ $contact['id'] }})" type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400">↑</button>
+                                <button wire:click="moveDown({{ $contact['id'] }})" type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400">↓</button>
+                                <button wire:click="editContact({{ $contact['id'] }})" type="button" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">Edit</button>
+                                <button wire:click="deleteContact({{ $contact['id'] }})" type="button" class="text-red-600 hover:text-red-800 dark:text-red-400" onclick="return confirm('Delete this contact?')">Delete</button>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        <!-- Email Addresses -->
+        @php $emails = collect($contacts)->where('type', 'email'); @endphp
+        @if($emails->isNotEmpty())
+            <div>
+                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">✉️ Email Addresses</h4>
+                <div class="space-y-2">
+                    @foreach($emails as $contact)
+                        <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $contact['value'] }}</span>
+                                    @if($contact['is_primary'])
+                                        <span class="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full">Primary</span>
+                                    @endif
+                                    @if(!$contact['is_public'])
+                                        <span class="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 rounded-full">Private</span>
+                                    @endif
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    {{ $contact['category'] === 'custom' ? $contact['custom_label'] : ucfirst($contact['category']) }}
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                @if(!$contact['is_primary'])
+                                    <button wire:click="setPrimary({{ $contact['id'] }})" type="button" class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400">Set Primary</button>
+                                @endif
+                                <button wire:click="moveUp({{ $contact['id'] }})" type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400">↑</button>
+                                <button wire:click="moveDown({{ $contact['id'] }})" type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400">↓</button>
+                                <button wire:click="editContact({{ $contact['id'] }})" type="button" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">Edit</button>
+                                <button wire:click="deleteContact({{ $contact['id'] }})" type="button" class="text-red-600 hover:text-red-800 dark:text-red-400" onclick="return confirm('Delete this contact?')">Delete</button>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        @if($phones->isEmpty() && $emails->isEmpty())
+            <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No contacts added yet. Click "Add Contact" to get started.</p>
+        @endif
+    </div>
+</div>

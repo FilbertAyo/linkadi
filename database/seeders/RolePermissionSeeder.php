@@ -37,6 +37,18 @@ class RolePermissionSeeder extends Seeder
             'edit social links',
             'delete social links',
             
+            // Package management
+            'view packages',
+            'create packages',
+            'edit packages',
+            'delete packages',
+            'manage packages',
+            
+            // Order management
+            'view orders',
+            'view all orders',
+            'manage orders',
+            
             // Analytics
             'view analytics',
             'view reports',
@@ -57,11 +69,18 @@ class RolePermissionSeeder extends Seeder
 
         // Create roles
         $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $clientRole = Role::firstOrCreate(['name' => 'client', 'guard_name' => 'web']);
         $moderatorRole = Role::firstOrCreate(['name' => 'moderator', 'guard_name' => 'web']);
         $userRole = Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']);
 
         // Assign all permissions to admin
         $adminRole->givePermissionTo(Permission::all());
+
+        // Assign specific permissions to client (can view packages and create orders)
+        $clientRole->givePermissionTo([
+            'view packages',
+            'view orders',
+        ]);
 
         // Assign specific permissions to moderator
         $moderatorRole->givePermissionTo([

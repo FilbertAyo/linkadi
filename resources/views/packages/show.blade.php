@@ -75,7 +75,7 @@
                                             <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                                 {{ $tier->min_quantity }}@if($tier->max_quantity) - {{ $tier->max_quantity }}@else+@endif cards
                                             </td>
-                                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">${{ number_format($tier->price_per_unit, 2) }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">TZS {{ number_format($tier->price_per_unit, 2) }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -115,7 +115,7 @@
                         <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-gray-600 dark:text-gray-400">Unit Price:</span>
-                                <span class="font-semibold text-gray-900 dark:text-white" id="unitPrice">${{ number_format($package->base_price ?? 0, 2) }}</span>
+                                <span class="font-semibold text-gray-900 dark:text-white" id="unitPrice">TZS {{ number_format($package->base_price ?? 0, 2) }}</span>
                             </div>
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-gray-600 dark:text-gray-400">Quantity:</span>
@@ -124,7 +124,7 @@
                             <hr class="my-3 border-gray-300 dark:border-gray-600">
                             <div class="flex justify-between items-center">
                                 <span class="text-lg font-semibold text-gray-900 dark:text-white">Total:</span>
-                                <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400" id="totalPrice">${{ number_format($package->base_price ?? 0, 2) }}</span>
+                                <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400" id="totalPrice">TZS {{ number_format($package->base_price ?? 0, 2) }}</span>
                             </div>
                         </div>
 
@@ -201,8 +201,8 @@
                 }
             }
 
-            document.getElementById('unitPrice').textContent = '$' + unitPrice.toFixed(2);
-            document.getElementById('totalPrice').textContent = '$' + totalPrice.toFixed(2);
+            document.getElementById('unitPrice').textContent = 'TZS ' + unitPrice.toFixed(2);
+            document.getElementById('totalPrice').textContent = 'TZS ' + totalPrice.toFixed(2);
         }
 
         // Initialize on page load

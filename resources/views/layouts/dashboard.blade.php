@@ -78,7 +78,7 @@
 
     <div class="flex overflow-hidden bg-gray-50 dark:bg-gray-900 pt-16">
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed z-30 top-16 left-0 bottom-0 hidden lg:flex flex-shrink-0 flex-col w-64 transition-width duration-75 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700" aria-label="Sidebar">
+        <aside id="sidebar" class="fixed z-30 top-20 left-8 bottom-4 hidden lg:flex flex-shrink-0 flex-col w-64 transition-width duration-75 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 rounded-lg shadow-sm" aria-label="Sidebar">
             <div class="relative flex-1 flex flex-col min-h-0 h-full">
                 <!-- User Profile Section -->
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -131,6 +131,14 @@
                     
                     <!-- Bottom Links -->
                     <div class="px-3 pt-4 pb-4 border-t border-gray-200 dark:border-gray-700 space-y-1 flex-shrink-0">
+                        @if(auth()->user()->hasRole('admin'))
+                            <a href="{{ route('admin.dashboard') }}" class="flex items-center px-3 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg">
+                                <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                </svg>
+                                Admin Panel
+                            </a>
+                        @endif
                         <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
                             <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
@@ -152,7 +160,7 @@
         <div class="bg-gray-900 opacity-50 hidden fixed top-16 left-0 right-0 bottom-0 z-20 lg:hidden" id="sidebarBackdrop"></div>
 
         <!-- Main content -->
-        <div id="main-content" class="h-full w-full bg-gray-50 dark:bg-gray-900 relative overflow-y-auto lg:ml-64">
+        <div id="main-content" class="h-full w-full bg-gray-50 dark:bg-gray-900 relative overflow-y-auto lg:ml-[18rem] lg:mr-8 lg:mt-4">
             <main class="p-6 lg:p-8">
                 {{ $slot }}
             </main>

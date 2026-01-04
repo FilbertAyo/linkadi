@@ -12,6 +12,11 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        // Redirect admins to admin dashboard
+        if (auth()->user()->hasRole('admin')) {
+            return redirect()->route('admin.dashboard');
+        }
+
         $packages = Package::active()
             ->ordered()
             ->with('pricingTiers')

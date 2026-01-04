@@ -40,7 +40,7 @@
                                         {{ $order->quantity }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                        ${{ number_format($order->total_price, 2) }}
+                                        TZS {{ number_format($order->total_price, 2) }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 py-1 text-xs font-medium rounded-full 

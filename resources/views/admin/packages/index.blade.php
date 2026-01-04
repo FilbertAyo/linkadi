@@ -81,12 +81,12 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                     @if($package->type === 'classic')
                                         @if($package->pricingTiers->isNotEmpty())
-                                            <span class="text-xs text-gray-500">From ${{ number_format($package->pricingTiers->first()->price_per_unit, 2) }}/unit</span>
+                                            <span class="text-xs text-gray-500">From TZS {{ number_format($package->pricingTiers->first()->price_per_unit, 2) }}/unit</span>
                                         @else
                                             <span class="text-xs text-gray-400">No tiers</span>
                                         @endif
                                     @else
-                                        ${{ number_format($package->base_price ?? 0, 2) }}
+                                        TZS {{ number_format($package->base_price ?? 0, 2) }}
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">

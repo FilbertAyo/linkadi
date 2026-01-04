@@ -19,26 +19,52 @@ class UserController extends Controller
     {
         $this->authorize('viewAny', User::class);
 
-        $query = User::with('roles')->latest();
+        // Separate queries for admin/moderator and clients
+        $adminModeratorQuery = User::with('roles')->whereHas('roles', function ($q) {
+            $q->whereIn('name', ['admin', 'moderator']);
+        });
 
-        // Search functionality
+        $clientQuery = User::with('roles')->where(function ($q) {
+            $q->whereHas('roles', function ($roleQ) {
+                $roleQ->where('name', 'client');
+            })->orWhereDoesntHave('roles');
+        });
+
+        // Search functionality for admin/moderator
         if ($request->has('search') && $request->search) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
+            $adminModeratorQuery->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
-        // Filter by role
-        if ($request->has('role') && $request->role) {
-            $query->role($request->role);
+        // Search functionality for clients
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $clientQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
         }
 
-        $users = $query->paginate(15)->withQueryString();
+        // Filter by role for admin/moderator
+        if ($request->has('role') && $request->role && in_array($request->role, ['admin', 'moderator'])) {
+            $adminModeratorQuery->role($request->role);
+        }
+
+        // Filter by role for clients
+        if ($request->has('role') && $request->role && $request->role === 'client') {
+            $clientQuery->whereHas('roles', function ($q) {
+                $q->where('name', 'client');
+            });
+        }
+
+        $adminModerators = $adminModeratorQuery->latest()->paginate(15, ['*'], 'admin_page')->withQueryString();
+        $clients = $clientQuery->latest()->paginate(15, ['*'], 'client_page')->withQueryString();
         $roles = Role::all();
 
-        return view('admin.users.index', compact('users', 'roles'));
+        return view('admin.users.index', compact('adminModerators', 'clients', 'roles'));
     }
 
     /**

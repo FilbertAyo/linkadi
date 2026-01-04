@@ -7,13 +7,19 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\On;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 
 new class extends Component
 {
+    use WithFileUploads;
+{
     // Profile fields
+    public string $profile_type = 'individual';
     public string $slug = '';
     public ?string $title = null;
     public ?string $company = null;
+    public ?string $business_name = null;
+    public ?string $tax_id = null;
     public ?string $bio = null;
     public ?string $phone = null;
     public ?string $email = null;
@@ -42,9 +48,12 @@ new class extends Component
         $profile = $user->profile;
 
         if ($profile) {
+            $this->profile_type = $profile->profile_type ?? 'individual';
             $this->slug = $profile->slug;
             $this->title = $profile->title;
             $this->company = $profile->company;
+            $this->business_name = $profile->business_name;
+            $this->tax_id = $profile->tax_id;
             $this->bio = $profile->bio;
             $this->phone = $profile->phone;
             $this->email = $profile->email;
@@ -104,9 +113,12 @@ new class extends Component
         
         // Validate profile data
         $validated = $this->validate([
+            'profile_type' => ['required', 'in:individual,business'],
             'slug' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/', 'unique:profiles,slug,' . ($user->profile?->id ?? 'NULL') . ',id'],
             'title' => ['nullable', 'string', 'max:255'],
             'company' => ['nullable', 'string', 'max:255'],
+            'business_name' => ['required_if:profile_type,business', 'nullable', 'string', 'max:255'],
+            'tax_id' => ['nullable', 'string', 'max:100'],
             'bio' => ['nullable', 'string', 'max:5000'],
             'phone' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
@@ -223,6 +235,49 @@ new class extends Component
 
     @if (!$showPreview)
         <form wire:submit="save" class="mt-6 space-y-6">
+            <!-- Profile Type Selection -->
+            <div>
+                <x-input-label :value="__('Profile Type')" />
+                <div class="mt-2 grid grid-cols-2 gap-4">
+                    <label class="relative flex cursor-pointer rounded-lg border p-4 {{ $profile_type === 'individual' ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' : 'border-gray-300 dark:border-gray-600' }}">
+                        <input 
+                            type="radio" 
+                            wire:model.live="profile_type" 
+                            value="individual" 
+                            class="sr-only"
+                        />
+                        <div class="flex flex-col">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">👤 Individual</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">Personal profile</span>
+                        </div>
+                        @if($profile_type === 'individual')
+                            <svg class="absolute top-3 right-3 h-5 w-5 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        @endif
+                    </label>
+
+                    <label class="relative flex cursor-pointer rounded-lg border p-4 {{ $profile_type === 'business' ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' : 'border-gray-300 dark:border-gray-600' }}">
+                        <input 
+                            type="radio" 
+                            wire:model.live="profile_type" 
+                            value="business" 
+                            class="sr-only"
+                        />
+                        <div class="flex flex-col">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">🏢 Business</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">Company profile</span>
+                        </div>
+                        @if($profile_type === 'business')
+                            <svg class="absolute top-3 right-3 h-5 w-5 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        @endif
+                    </label>
+                </div>
+                <x-input-error class="mt-2" :messages="$errors->get('profile_type')" />
+            </div>
+
             <!-- Profile Slug -->
             <div>
                 <x-input-label for="slug" :value="__('Profile URL Slug')" />
@@ -290,19 +345,38 @@ new class extends Component
                 </div>
             </div>
 
+            <!-- Business Name (Business Only) -->
+            @if($profile_type === 'business')
+                <div>
+                    <x-input-label for="business_name" :value="__('Business/Company Name')" />
+                    <x-text-input wire:model="business_name" id="business_name" name="business_name" type="text" class="mt-1 block w-full" required />
+                    <x-input-error class="mt-2" :messages="$errors->get('business_name')" />
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Your company or business name</p>
+                </div>
+            @endif
+
             <!-- Basic Information -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <x-input-label for="title" :value="__('Job Title')" />
+                    <x-input-label for="title" :value="$profile_type === 'business' ? __('Your Position/Role') : __('Job Title')" />
                     <x-text-input wire:model="title" id="title" name="title" type="text" class="mt-1 block w-full" />
                     <x-input-error class="mt-2" :messages="$errors->get('title')" />
                 </div>
 
-                <div>
-                    <x-input-label for="company" :value="__('Company')" />
-                    <x-text-input wire:model="company" id="company" name="company" type="text" class="mt-1 block w-full" />
-                    <x-input-error class="mt-2" :messages="$errors->get('company')" />
-                </div>
+                @if($profile_type === 'individual')
+                    <div>
+                        <x-input-label for="company" :value="__('Company (Employer)')" />
+                        <x-text-input wire:model="company" id="company" name="company" type="text" class="mt-1 block w-full" />
+                        <x-input-error class="mt-2" :messages="$errors->get('company')" />
+                    </div>
+                @else
+                    <div>
+                        <x-input-label for="tax_id" :value="__('Tax ID / Registration Number (Optional)')" />
+                        <x-text-input wire:model="tax_id" id="tax_id" name="tax_id" type="text" class="mt-1 block w-full" />
+                        <x-input-error class="mt-2" :messages="$errors->get('tax_id')" />
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">VAT, TIN, or business registration number</p>
+                    </div>
+                @endif
             </div>
 
             <!-- Bio -->
@@ -319,18 +393,18 @@ new class extends Component
             </div>
 
             <!-- Contact Information -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <x-input-label for="phone" :value="__('Phone')" />
-                    <x-text-input wire:model="phone" id="phone" name="phone" type="tel" class="mt-1 block w-full" />
-                    <x-input-error class="mt-2" :messages="$errors->get('phone')" />
-                </div>
-
-                <div>
-                    <x-input-label for="email" :value="__('Email')" />
-                    <x-text-input wire:model="email" id="email" name="email" type="email" class="mt-1 block w-full" />
-                    <x-input-error class="mt-2" :messages="$errors->get('email')" />
-                </div>
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Contact Information</h3>
+                @if($profile = Auth::user()->profile)
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <livewire:profile.contact-manager :profileId="$profile->id" type="phone" :key="'phone-'.$profile->id" />
+                        <livewire:profile.contact-manager :profileId="$profile->id" type="email" :key="'email-'.$profile->id" />
+                    </div>
+                @else
+                    <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                        <p class="text-sm text-yellow-800 dark:text-yellow-200">Please save your profile first to add contact information.</p>
+                    </div>
+                @endif
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

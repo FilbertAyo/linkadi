@@ -59,7 +59,7 @@
                             </div>
 
                             <div id="basePriceField" class="md:col-span-2" style="display: none;">
-                                <label for="base_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Base Price ($) *</label>
+                                <label for="base_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Base Price (TZS) *</label>
                                 <input type="number" name="base_price" id="base_price" value="{{ old('base_price', $package->base_price) }}" step="0.01" min="0"
                                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
                                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Single price for NFC card packages</p>
@@ -151,7 +151,7 @@
                                                 placeholder="Leave blank for unlimited">
                                         </div>
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price Per Unit ($) *</label>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price Per Unit (TZS) *</label>
                                             <input type="number" name="pricing_tiers[{{ $index }}][price_per_unit]" value="{{ old("pricing_tiers.{$index}.price_per_unit", $tier->price_per_unit) }}" required step="0.01" min="0"
                                                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
                                         </div>

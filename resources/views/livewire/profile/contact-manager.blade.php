@@ -1,0 +1,161 @@
+<div>
+    <div class="mb-4">
+        <div class="flex items-center justify-between mb-3">
+            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {{ $type === 'phone' ? '📞 Phone Numbers' : '✉️ Email Addresses' }}
+                <span class="text-xs text-gray-500">({{ count($contacts) }}/10)</span>
+            </h4>
+            @if(count($contacts) < 10)
+                <button 
+                    wire:click="$toggle('showAddForm')" 
+                    type="button"
+                    class="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+                >
+                    {{ $showAddForm ? '✕ Cancel' : '+ Add ' . ($type === 'phone' ? 'Phone' : 'Email') }}
+                </button>
+            @endif
+        </div>
+
+        <!-- Existing Contacts -->
+        <div class="space-y-2">
+            @forelse($contacts as $index => $contact)
+                <div class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <!-- Contact Info -->
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            @if($contact['is_primary'])
+                                <span class="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded">
+                                    Primary
+                                </span>
+                            @endif
+                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ $contact['category'] === 'custom' && $contact['custom_label'] ? $contact['custom_label'] : ucfirst($contact['category']) }}
+                            </span>
+                        </div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white mt-1">
+                            @if($type === 'phone')
+                                <a href="tel:{{ $contact['value'] }}" class="hover:text-indigo-600">{{ $contact['value'] }}</a>
+                            @else
+                                <a href="mailto:{{ $contact['value'] }}" class="hover:text-indigo-600">{{ $contact['value'] }}</a>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center gap-2">
+                        @if(!$contact['is_primary'])
+                            <button 
+                                wire:click="setPrimary({{ $contact['id'] }})" 
+                                type="button"
+                                class="text-xs text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+                                title="Set as primary"
+                            >
+                                ⭐
+                            </button>
+                        @endif
+                        <button 
+                            wire:click="deleteContact({{ $contact['id'] }})" 
+                            type="button"
+                            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                            onclick="return confirm('Delete this {{ $type }}?')"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            @empty
+                <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                    No {{ $type === 'phone' ? 'phone numbers' : 'email addresses' }} added yet
+                </p>
+            @endforelse
+        </div>
+
+        <!-- Add Form -->
+        @if($showAddForm)
+            <div class="mt-3 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                <div class="space-y-3">
+                    <!-- Value Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            {{ $type === 'phone' ? 'Phone Number' : 'Email Address' }}
+                        </label>
+                        <input 
+                            wire:model="newContact.value" 
+                            type="{{ $type === 'phone' ? 'tel' : 'email' }}"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                            placeholder="{{ $type === 'phone' ? '+1 (555) 123-4567' : 'email@example.com' }}"
+                        />
+                        @error('newContact.value') <span class="text-xs text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Category -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                        <select 
+                            wire:model.live="newContact.category"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        >
+                            <option value="main">Main</option>
+                            <option value="work">Work</option>
+                            <option value="home">Home</option>
+                            @if($type === 'phone')
+                                <option value="mobile">Mobile</option>
+                            @endif
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+
+                    <!-- Custom Label -->
+                    @if($newContact['category'] === 'custom')
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Custom Label</label>
+                            <input 
+                                wire:model="newContact.custom_label"
+                                type="text"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                                placeholder="e.g., Office, Assistant"
+                            />
+                            @error('newContact.custom_label') <span class="text-xs text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                        </div>
+                    @endif
+
+                    <!-- Checkboxes -->
+                    <div class="flex gap-4">
+                        <label class="flex items-center">
+                            <input wire:model="newContact.is_primary" type="checkbox" class="rounded text-indigo-600">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Set as primary</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input wire:model="newContact.is_public" type="checkbox" class="rounded text-indigo-600">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Show on public profile</span>
+                        </label>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex gap-2">
+                        <button 
+                            wire:click="addContact" 
+                            type="button"
+                            class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium"
+                        >
+                            Add {{ $type === 'phone' ? 'Phone' : 'Email' }}
+                        </button>
+                        <button 
+                            wire:click="$set('showAddForm', false)" 
+                            type="button"
+                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 text-sm font-medium dark:bg-gray-600 dark:text-gray-200"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        @if(count($contacts) >= 10)
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Maximum of 10 {{ $type === 'phone' ? 'phone numbers' : 'email addresses' }} reached</p>
+        @endif
+    </div>
+</div>
