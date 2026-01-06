@@ -145,9 +145,9 @@ new class extends Component
                 </div> <!-- Display Mode and Profile Type Selection (Side by Side) -->
                 <div class="grid grid-cols-1 md:grid-cols-1 gap-6"> <!-- Display Mode Selection -->
                     <div> <x-input-label for="display_mode" :value="__('What Information to Display')" /> <select wire:model.live="display_mode" id="display_mode" name="display_mode" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                            <option value="personal_only">👤 Personal Only</option>
-                            <option value="company_only">🏢 Company Only</option>
-                            <option value="combined">🔄 Combined (Both)</option>
+                            <option value="personal_only">Personal Only</option>
+                            <option value="company_only">Company Only</option>
+                            <option value="combined">Combined (Both)</option>
                         </select> <x-input-error class="mt-2" :messages="$errors->get('display_mode')" />
                         <p class="mt-1 text-xs text-gray-500"> What information to show on this profile </p>
                     </div>

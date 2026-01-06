@@ -15,6 +15,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50">
+    <!-- Flash Messages -->
+    <x-flash-messages />
+    
     <main class="bg-gray-50">
         <div class="mx-auto md:h-screen flex flex-col justify-center items-center px-6 pt-8 pt:mt-0">
             <div class="flex justify-between items-center w-full sm:max-w-screen-sm mb-8 lg:mb-10">

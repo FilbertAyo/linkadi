@@ -103,29 +103,10 @@
 
         <!-- Main content -->
         <div id="main-content" class="h-full w-full bg-gray-50 relative overflow-y-auto lg:ml-[18rem] lg:mr-8 pt-16">
+            <!-- Flash Messages -->
+            <x-flash-messages />
+            
             <main class="p-4 sm:p-6 lg:p-8">
-                @if(session('success'))
-                    <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @if(session('error'))
-                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                        {{ session('error') }}
-                    </div>
-                @endif
-
-                @if($errors->any())
-                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                        <ul class="list-disc list-inside">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
                 {{ $slot }}
             </main>
         </div>

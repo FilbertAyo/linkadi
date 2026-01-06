@@ -22,6 +22,8 @@
     </style>
 </head>
 <body class="h-full bg-gray-50">
+    <!-- Flash Messages -->
+    <x-flash-messages />
     
     <!-- Top Navigation (Landing Page Style) -->
     @include('layouts.clients.navigation')

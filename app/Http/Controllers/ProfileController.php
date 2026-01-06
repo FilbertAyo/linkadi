@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Traits\WebResponseTrait;
 use App\Services\ProfilePublishingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
+    use WebResponseTrait;
+    
     protected ProfilePublishingService $publishingService;
 
     public function __construct(ProfilePublishingService $publishingService)
@@ -32,8 +35,10 @@ class ProfileController extends Controller
         }
 
         if (!$profile) {
-            return redirect()->route('profile.builder')
-                ->with('error', 'Please create your profile first.');
+            return $this->redirectToRouteWithError(
+                'profile.builder',
+                'Please create your profile first.'
+            );
         }
 
         if (!$profile->canPublish()) {
@@ -47,18 +52,22 @@ class ProfileController extends Controller
                 default => 'Your profile cannot be published at this time.',
             };
 
-            return redirect()->route('dashboard')
-                ->with('error', $message);
+            return $this->redirectToRouteWithError('dashboard', $message);
         }
 
         try {
             $this->publishingService->publish($profile);
 
-            return redirect()->route('dashboard')
-                ->with('success', '🎉 Your profile "' . ($profile->profile_name ?? 'Profile') . '" is now live! Share it with the world: ' . $profile->public_url);
+            return $this->redirectToRouteWithSuccess(
+                'dashboard',
+                '🎉 Your profile "' . ($profile->profile_name ?? 'Profile') . '" is now live! Share it with the world: ' . $profile->public_url
+            );
         } catch (\Exception $e) {
-            return redirect()->route('dashboard')
-                ->with('error', 'Failed to publish profile: ' . $e->getMessage());
+            return $this->handleExceptionRedirect(
+                $e,
+                'Failed to publish profile: ' . $e->getMessage(),
+                'dashboard'
+            );
         }
     }
 
@@ -79,23 +88,26 @@ class ProfileController extends Controller
         }
 
         if (!$profile) {
-            return redirect()->route('dashboard')
-                ->with('error', 'Profile not found.');
+            return $this->redirectToRouteWithError('dashboard', 'Profile not found.');
         }
 
         if (!$profile->isPublished()) {
-            return redirect()->route('dashboard')
-                ->with('error', 'Your profile is not published.');
+            return $this->redirectToRouteWithWarning('dashboard', 'Your profile is not published.');
         }
 
         try {
             $this->publishingService->unpublish($profile);
 
-            return redirect()->route('dashboard')
-                ->with('success', 'Your profile "' . ($profile->profile_name ?? 'Profile') . '" has been unpublished and is no longer publicly accessible.');
+            return $this->redirectToRouteWithSuccess(
+                'dashboard',
+                'Your profile "' . ($profile->profile_name ?? 'Profile') . '" has been unpublished and is no longer publicly accessible.'
+            );
         } catch (\Exception $e) {
-            return redirect()->route('dashboard')
-                ->with('error', 'Failed to unpublish profile: ' . $e->getMessage());
+            return $this->handleExceptionRedirect(
+                $e,
+                'Failed to unpublish profile: ' . $e->getMessage(),
+                'dashboard'
+            );
         }
     }
 }
