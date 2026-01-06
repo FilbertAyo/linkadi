@@ -49,7 +49,6 @@ new class extends Component
                         <tr>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Display Mode</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -86,11 +85,7 @@ new class extends Component
                                         <span class="font-mono text-xs">{{ $profile->slug }}</span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded">
-                                        {{ ucfirst($profile->profile_type ?? 'individual') }}
-                                    </span>
-                                </td>
+                             
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded">
                                         {{ ucfirst($profile->display_mode ?? 'combined') }}
