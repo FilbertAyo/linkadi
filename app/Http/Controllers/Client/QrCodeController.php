@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard;
+namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Profile;
@@ -17,7 +17,7 @@ class QrCodeController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('dashboard.qr-codes.index', compact('profiles'));
+        return view('client.qr-codes.index', compact('profiles'));
     }
 }
 

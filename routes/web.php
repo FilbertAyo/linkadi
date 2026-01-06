@@ -3,6 +3,10 @@
 use App\Http\Controllers\PublicProfileController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\Client\CardController;
+use App\Http\Controllers\Client\OrderController;
+use App\Http\Controllers\Client\SubscriptionController;
+use App\Http\Controllers\Client\QrCodeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
@@ -20,41 +24,41 @@ Route::get('p/{slug}/vcard', [PublicProfileController::class, 'downloadVCard'])
 Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {
     // QR Codes
     Route::prefix('qr-codes')->name('qr-codes.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Dashboard\QrCodeController::class, 'index'])
+        Route::get('/', [QrCodeController::class, 'index'])
             ->name('index');
     });
     
     // Cards & Packages
     Route::prefix('cards')->name('cards.')->group(function () {
-        Route::get('/packages', [App\Http\Controllers\Dashboard\CardController::class, 'packages'])
+        Route::get('/packages', [CardController::class, 'packages'])
             ->name('packages');
-        Route::get('/checkout/{package:slug}', [App\Http\Controllers\Dashboard\CardController::class, 'checkout'])
+        Route::get('/checkout/{package:slug}', [CardController::class, 'checkout'])
             ->name('checkout');
-        Route::post('/order', [App\Http\Controllers\Dashboard\CardController::class, 'store'])
+        Route::post('/order', [CardController::class, 'store'])
             ->name('store');
     });
     
     // Orders
     Route::prefix('orders')->name('orders.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Dashboard\OrderController::class, 'index'])
+        Route::get('/', [OrderController::class, 'index'])
             ->name('index');
-        Route::get('/{order}', [App\Http\Controllers\Dashboard\OrderController::class, 'show'])
+        Route::get('/{order}', [OrderController::class, 'show'])
             ->name('show');
-        Route::get('/{order}/payment', [App\Http\Controllers\Dashboard\OrderController::class, 'payment'])
+        Route::get('/{order}/payment', [OrderController::class, 'payment'])
             ->name('payment');
-        Route::post('/{order}/process-payment', [App\Http\Controllers\Dashboard\OrderController::class, 'processPayment'])
+        Route::post('/{order}/process-payment', [OrderController::class, 'processPayment'])
             ->name('process-payment');
     });
     
     // Subscriptions
     Route::prefix('subscriptions')->name('subscriptions.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Dashboard\SubscriptionController::class, 'index'])
+        Route::get('/', [SubscriptionController::class, 'index'])
             ->name('index');
-        Route::get('/{profile}', [App\Http\Controllers\Dashboard\SubscriptionController::class, 'show'])
+        Route::get('/{profile}', [SubscriptionController::class, 'show'])
             ->name('show');
-        Route::post('/{profile}/renew', [App\Http\Controllers\Dashboard\SubscriptionController::class, 'renew'])
+        Route::post('/{profile}/renew', [SubscriptionController::class, 'renew'])
             ->name('renew');
-        Route::post('/bulk-renew', [App\Http\Controllers\Dashboard\SubscriptionController::class, 'bulkRenew'])
+        Route::post('/bulk-renew', [SubscriptionController::class, 'bulkRenew'])
             ->name('bulk-renew');
     });
 });

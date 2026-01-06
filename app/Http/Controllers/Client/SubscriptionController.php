@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard;
+namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Profile;
@@ -38,7 +38,7 @@ class SubscriptionController extends Controller
         $expiredProfiles = $profiles->where('status', 'expired');
         $draftProfiles = $profiles->where('status', 'draft');
         
-        return view('dashboard.subscriptions.index', compact(
+        return view('client.subscriptions.index', compact(
             'profiles',
             'stats',
             'activeProfiles',
@@ -60,7 +60,7 @@ class SubscriptionController extends Controller
         
         $profile->load(['package', 'order']);
         
-        return view('dashboard.subscriptions.show', compact('profile'));
+        return view('client.subscriptions.show', compact('profile'));
     }
     
     /**
@@ -90,7 +90,7 @@ class SubscriptionController extends Controller
             
             $message = $years > 1 ? "Renewal order created for {$years} years. Please complete payment." : 'Renewal order created. Please complete payment.';
             
-            return redirect()->route('dashboard.orders.payment', $order)
+            return redirect()->route('client.orders.payment', $order)
                 ->with('success', $message);
         } catch (\Exception $e) {
             Log::error('Failed to create renewal order', [
@@ -136,7 +136,7 @@ class SubscriptionController extends Controller
             $profileCount = count($validated['profile_ids']);
             $discountMsg = $profileCount >= 3 || $years >= 2 ? 'Discount applied!' : '';
             
-            return redirect()->route('dashboard.orders.payment', $order)
+            return redirect()->route('client.orders.payment', $order)
                 ->with('success', "Bulk renewal order created for {$profileCount} " . \Illuminate\Support\Str::plural('profile', $profileCount) . " ({$years} " . \Illuminate\Support\Str::plural('year', $years) . "). {$discountMsg} Please complete payment.");
         } catch (\Exception $e) {
             Log::error('Failed to create bulk renewal order', [

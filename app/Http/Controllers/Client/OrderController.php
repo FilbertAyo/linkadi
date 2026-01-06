@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard;
+namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
@@ -45,7 +45,7 @@ class OrderController extends Controller
             'paid' => Auth::user()->orders()->where('payment_status', 'paid')->count(),
         ];
         
-        return view('dashboard.orders.index', compact('orders', 'statusCounts', 'paymentStatusCounts'));
+        return view('client.orders.index', compact('orders', 'statusCounts', 'paymentStatusCounts'));
     }
 
     /**
@@ -60,7 +60,7 @@ class OrderController extends Controller
 
         $order->load(['package', 'nfcCards.profile']);
 
-        return view('dashboard.orders.show', compact('order'));
+        return view('client.orders.show', compact('order'));
     }
     
     /**
@@ -87,7 +87,7 @@ class OrderController extends Controller
         
         $order->load(['package', 'nfcCards.profile']);
         
-        return view('dashboard.orders.payment', compact('order'));
+        return view('client.orders.payment', compact('order'));
     }
     
     /**
@@ -201,6 +201,6 @@ class OrderController extends Controller
             ->latest()
             ->paginate(15);
         
-        return view('dashboard.orders.pending', compact('orders'));
+        return view('client.orders.pending', compact('orders'));
     }
 }

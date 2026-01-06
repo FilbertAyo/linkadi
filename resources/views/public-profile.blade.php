@@ -92,7 +92,47 @@
                 </div> <!-- Bio Section --> @if($profile->bio) <div class="px-6 sm:px-8 pb-6 border-t border-gray-200 pt-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-3">About</h2>
                     <p class="text-gray-700 whitespace-pre-wrap">{{ $profile->bio }}</p>
-                </div> @endif <!-- Contact Information --> @php $publicContacts = $profile->contacts()->public()->get(); $phones = $publicContacts->where('type', 'phone'); $emails = $publicContacts->where('type', 'email'); // Filter contacts based on display mode // For personal_only: show only personal contacts (if labeled as personal) // For company_only: show only company contacts (if labeled as company) // For combined: show all if ($profile->displaysPersonalOnly()) { $phones = $phones->filter(function($contact) { return !$contact->is_company || $contact->label === 'Personal'; }); $emails = $emails->filter(function($contact) { return !$contact->is_company || $contact->label === 'Personal'; }); } elseif ($profile->displaysCompanyOnly()) { $phones = $phones->filter(function($contact) { return $contact->is_company || $contact->label === 'Company' || $contact->label === 'Business'; }); $emails = $emails->filter(function($contact) { return $contact->is_company || $contact->label === 'Company' || $contact->label === 'Business'; }); } // Show website/address based on display mode $showWebsite = $profile->website && ( $profile->displaysCombined() || ($profile->displaysCompanyOnly() && $profile->isBusiness()) || ($profile->displaysPersonalOnly() && !$profile->isBusiness()) ); $showAddress = $profile->address && ( $profile->displaysCombined() || ($profile->displaysCompanyOnly() && $profile->isBusiness()) || ($profile->displaysPersonalOnly() && !$profile->isBusiness()) ); @endphp @if($phones->isNotEmpty() || $emails->isNotEmpty() || $showWebsite || $showAddress) <div class="px-6 sm:px-8 pb-6 border-t border-gray-200 pt-6">
+                </div> @endif <!-- Contact Information --> @php
+$publicContacts = $profile->contacts()->public()->get();
+$phones = $publicContacts->where('type', 'phone');
+$emails = $publicContacts->where('type', 'email');
+
+// Filter contacts based on display mode
+// For personal_only: show only personal contacts (if labeled as personal)
+// For company_only: show only company contacts (if labeled as company)
+// For combined: show all
+if ($profile->displaysPersonalOnly()) {
+    $phones = $phones->filter(function($contact) {
+        return !$contact->is_company || $contact->label === 'Personal';
+    });
+    $emails = $emails->filter(function($contact) {
+        return !$contact->is_company || $contact->label === 'Personal';
+    });
+} elseif ($profile->displaysCompanyOnly()) {
+    $phones = $phones->filter(function($contact) {
+        return $contact->is_company || $contact->label === 'Company' || $contact->label === 'Business';
+    });
+    $emails = $emails->filter(function($contact) {
+        return $contact->is_company || $contact->label === 'Company' || $contact->label === 'Business';
+    });
+}
+
+// Show website/address based on display mode
+$showWebsite = false;
+$showAddress = false;
+
+if ($profile->website) {
+    $showWebsite = $profile->displaysCombined() 
+        || ($profile->displaysCompanyOnly() && $profile->isBusiness()) 
+        || ($profile->displaysPersonalOnly() && !$profile->isBusiness());
+}
+
+if ($profile->address) {
+    $showAddress = $profile->displaysCombined() 
+        || ($profile->displaysCompanyOnly() && $profile->isBusiness()) 
+        || ($profile->displaysPersonalOnly() && !$profile->isBusiness());
+}
+@endphp @if($phones->isNotEmpty() || $emails->isNotEmpty() || $showWebsite || $showAddress) <div class="px-6 sm:px-8 pb-6 border-t border-gray-200 pt-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4">Contact Information</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> @foreach($phones as $phone) <div class="flex items-center gap-3"> <span class="text-lg">{{ $phone->icon }}</span>
                             <div class="flex-1"> <a href="tel:{{ $phone->value }}" class="text-gray-700 primary-hover transition-colors"> {{ $phone->value }} </a>

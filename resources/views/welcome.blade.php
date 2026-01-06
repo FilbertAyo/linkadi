@@ -31,7 +31,7 @@
 
 <body class="antialiased font-sans">
 
-    @include('landing.navigation')
+     @include('layouts.landing.navigation')
 
     <!-- Hero Section -->
     <section class="bg-white">
@@ -308,7 +308,7 @@
     </section>
 
     <!-- Footer -->
-    @include('landing.footer')
+    @include('layouts.landing.footer')
 
     <!-- Flowbite JS for accordion -->
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>

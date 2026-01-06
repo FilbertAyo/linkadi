@@ -1,4 +1,4 @@
-<x-dashboard-layout>
+<x-client-layout>
     <div class="pt-6">
         <div class="w-full space-y-6">
             <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 border border-gray-200">
@@ -12,4 +12,4 @@
           
         </div>
     </div>
-</x-dashboard-layout>
+</x-client-layout>

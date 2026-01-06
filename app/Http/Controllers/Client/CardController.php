@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard;
+namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\NfcCard;
@@ -27,7 +27,7 @@ class CardController extends Controller
         $userProfiles = Auth::user()->profiles;
         $draftProfiles = $userProfiles->where('status', 'draft');
         
-        return view('dashboard.cards.packages', compact('packages', 'userProfiles', 'draftProfiles'));
+        return view('client.cards.packages', compact('packages', 'userProfiles', 'draftProfiles'));
     }
     
     /**
@@ -52,7 +52,7 @@ class CardController extends Controller
                 ->with('info', 'Please create a profile first before ordering an NFC card.');
         }
         
-        return view('dashboard.cards.checkout', compact('package', 'availableProfiles'));
+        return view('client.cards.checkout', compact('package', 'availableProfiles'));
     }
     
     /**
@@ -205,7 +205,7 @@ class CardController extends Controller
             });
             
             // Redirect to payment page
-            return redirect()->route('dashboard.orders.payment', $order)
+            return redirect()->route('client.orders.payment', $order)
                 ->with('success', 'Order created successfully! Please complete payment to activate your profiles.');
                 
         } catch (\Exception $e) {

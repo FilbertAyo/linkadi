@@ -24,7 +24,7 @@
 <body class="h-full bg-gray-50">
     
     <!-- Top Navigation (Landing Page Style) -->
-    @include('clients.navigation')
+    @include('layouts.clients.navigation')
 
     <!-- Mobile sidebar backdrop -->
     <div class="bg-gray-900 opacity-50 hidden fixed top-16 left-0 right-0 bottom-0 z-20 lg:hidden" id="sidebarBackdrop"></div>
@@ -33,7 +33,7 @@
         <div class="max-w-screen-xl px-4 mx-auto">
             <div class="flex gap-4 lg:gap-6 py-4">
                 <!-- Sidebar -->
-                @include('clients.aside')
+                @include('layouts.clients.aside')
                 <!-- Main content -->
                 <div id="main-content" class="flex-1 min-w-0 bg-white border border-gray-200 rounded-lg shadow-sm">
                     <main class="p-6 lg:p-8">

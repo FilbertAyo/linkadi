@@ -1,6 +1,6 @@
-<x-dashboard-layout>
+<x-client-layout>
     <div class="pt-6">
         <livewire:profile.profile-builder-index />
     </div>
-</x-dashboard-layout>
+</x-client-layout>
 

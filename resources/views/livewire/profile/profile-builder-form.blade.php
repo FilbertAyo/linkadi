@@ -12,7 +12,108 @@ use Livewire\WithFileUploads;
 
 new class extends Component
 {
-    use WithFileUploads; 
+    use WithFileUploads;
+    
+    public bool $showPreview = false;
+    public ?int $profileId = null;
+    public bool $isCreatingNew = true;
+    public ?int $current_profile_id = null;
+    
+    // Form fields
+    public string $profile_name = '';
+    public string $slug = '';
+    public string $display_mode = 'combined';
+    public ?string $profile_type = null;
+    public ?string $title = null;
+    public ?string $company = null;
+    public ?string $business_name = null;
+    public ?string $tax_id = null;
+    public ?string $bio = null;
+    public ?string $website = null;
+    public ?string $address = null;
+    public bool $is_public = true;
+    
+    // Images
+    public $profile_image;
+    public $cover_image;
+    public ?string $existing_profile_image = null;
+    public ?string $existing_cover_image = null;
+    
+    // Social links
+    public array $socialLinks = [];
+    
+    public function mount(?int $profileId = null): void
+    {
+        $this->profileId = $profileId;
+        $this->current_profile_id = $profileId;
+        $this->isCreatingNew = $profileId === null;
+        
+        if ($this->profileId) {
+            $profile = Auth::user()->profiles()->find($this->profileId);
+            if ($profile) {
+                $this->profile_name = $profile->profile_name ?? '';
+                $this->slug = $profile->slug ?? '';
+                $this->display_mode = $profile->display_mode ?? 'combined';
+                $this->profile_type = $profile->profile_type ?? null;
+                $this->title = $profile->title ?? null;
+                $this->company = $profile->company ?? null;
+                $this->business_name = $profile->business_name ?? null;
+                $this->tax_id = $profile->tax_id ?? null;
+                $this->bio = $profile->bio ?? null;
+                $this->website = $profile->website ?? null;
+                $this->address = $profile->address ?? null;
+                $this->is_public = $profile->is_public ?? true;
+                $this->existing_profile_image = $profile->profile_image;
+                $this->existing_cover_image = $profile->cover_image;
+                
+                // Load social links
+                $this->socialLinks = $profile->socialLinks->map(function ($link) {
+                    return [
+                        'platform' => $link->platform ?? 'custom',
+                        'label' => $link->label ?? '',
+                        'url' => $link->url ?? '',
+                    ];
+                })->toArray();
+            }
+        }
+        
+        // Initialize empty social links array if creating new
+        if (empty($this->socialLinks)) {
+            $this->socialLinks = [];
+        }
+    }
+    
+    public function togglePreview(): void
+    {
+        $this->showPreview = !$this->showPreview;
+    }
+    
+    public function addSocialLink(): void
+    {
+        $this->socialLinks[] = [
+            'platform' => 'custom',
+            'label' => '',
+            'url' => '',
+        ];
+    }
+    
+    public function removeSocialLink(int $index): void
+    {
+        unset($this->socialLinks[$index]);
+        $this->socialLinks = array_values($this->socialLinks);
+    }
+    
+    public function save(): void
+    {
+        // This method will be implemented with validation and saving logic
+        // For now, just a placeholder to prevent errors
+    }
+    
+    public function deleteProfile(): void
+    {
+        // This method will be implemented with deletion logic
+        // For now, just a placeholder to prevent errors
+    }
     
 }; ?> <div class="w-full">
     <section>

@@ -1,4 +1,4 @@
-<x-dashboard-layout>
+<x-client-layout>
     
         <div class="w-full grid grid-cols-1 gap-4">
             <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 border border-gray-200">
@@ -43,4 +43,4 @@
                     </div> @endforeach </div> @endif
             </div>
         </div>
-</x-dashboard-layout>
+</x-client-layout>
