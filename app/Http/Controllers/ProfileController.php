@@ -20,7 +20,16 @@ class ProfileController extends Controller
      */
     public function publish(Request $request): RedirectResponse
     {
-        $profile = $request->user()->profile;
+        $user = $request->user();
+        
+        // Get profile_id from request or use primary profile
+        $profileId = $request->input('profile_id');
+        
+        if ($profileId) {
+            $profile = $user->profiles()->findOrFail($profileId);
+        } else {
+            $profile = $user->primaryProfile ?? $user->profiles()->first();
+        }
 
         if (!$profile) {
             return redirect()->route('profile.builder')
@@ -46,7 +55,7 @@ class ProfileController extends Controller
             $this->publishingService->publish($profile);
 
             return redirect()->route('dashboard')
-                ->with('success', '🎉 Your profile is now live! Share it with the world: ' . $profile->public_url);
+                ->with('success', '🎉 Your profile "' . ($profile->profile_name ?? 'Profile') . '" is now live! Share it with the world: ' . $profile->public_url);
         } catch (\Exception $e) {
             return redirect()->route('dashboard')
                 ->with('error', 'Failed to publish profile: ' . $e->getMessage());
@@ -58,7 +67,16 @@ class ProfileController extends Controller
      */
     public function unpublish(Request $request): RedirectResponse
     {
-        $profile = $request->user()->profile;
+        $user = $request->user();
+        
+        // Get profile_id from request or use primary profile
+        $profileId = $request->input('profile_id');
+        
+        if ($profileId) {
+            $profile = $user->profiles()->findOrFail($profileId);
+        } else {
+            $profile = $user->primaryProfile ?? $user->profiles()->first();
+        }
 
         if (!$profile) {
             return redirect()->route('dashboard')
@@ -74,7 +92,7 @@ class ProfileController extends Controller
             $this->publishingService->unpublish($profile);
 
             return redirect()->route('dashboard')
-                ->with('success', 'Your profile has been unpublished and is no longer publicly accessible.');
+                ->with('success', 'Your profile "' . ($profile->profile_name ?? 'Profile') . '" has been unpublished and is no longer publicly accessible.');
         } catch (\Exception $e) {
             return redirect()->route('dashboard')
                 ->with('error', 'Failed to unpublish profile: ' . $e->getMessage());

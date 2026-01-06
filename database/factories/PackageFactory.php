@@ -24,7 +24,7 @@ class PackageFactory extends Factory
             'name' => $name,
             'slug' => Str::slug($name),
             'description' => fake()->paragraph(),
-            'type' => fake()->randomElement(['nfc_plain', 'nfc_printed', 'classic']),
+            'type' => fake()->randomElement(['nfc_card', 'classic']),
             'image' => null,
             'is_active' => true,
             'display_order' => 0,
@@ -38,24 +38,13 @@ class PackageFactory extends Factory
     }
 
     /**
-     * Indicate that the package is NFC Plain type.
+     * Indicate that the package is NFC Card type.
      */
-    public function nfcPlain(): static
+    public function nfcCard(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'nfc_plain',
-            'base_price' => 29.99,
-        ]);
-    }
-
-    /**
-     * Indicate that the package is NFC Printed type.
-     */
-    public function nfcPrinted(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'type' => 'nfc_printed',
-            'base_price' => 39.99,
+            'type' => 'nfc_card',
+            'base_price' => 30000.00,
         ]);
     }
 

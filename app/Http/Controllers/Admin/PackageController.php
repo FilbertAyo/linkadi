@@ -63,11 +63,16 @@ class PackageController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'unique:packages,slug'],
             'description' => ['nullable', 'string'],
-            'type' => ['required', 'in:nfc_plain,nfc_printed,classic'],
+            'type' => ['required', 'in:nfc_card,classic'],
             'image' => ['nullable', 'image', 'max:2048'],
             'is_active' => ['boolean'],
             'display_order' => ['nullable', 'integer', 'min:0'],
             'base_price' => ['nullable', 'numeric', 'min:0'],
+            'subscription_renewal_price' => ['nullable', 'numeric', 'min:0'],
+            'printing_fee' => ['nullable', 'numeric', 'min:0'],
+            'design_fee' => ['nullable', 'numeric', 'min:0'],
+            'card_colors' => ['nullable', 'array'],
+            'card_colors.*' => ['string', 'max:255'],
             'features' => ['nullable', 'array'],
             'features.*' => ['string', 'max:255'],
         ]);
@@ -85,6 +90,11 @@ class PackageController extends Controller
         // Set default values
         $validated['is_active'] = $request->has('is_active') ? true : false;
         $validated['display_order'] = $validated['display_order'] ?? 0;
+        
+        // Clean up empty card_colors array
+        if (isset($validated['card_colors']) && empty(array_filter($validated['card_colors']))) {
+            $validated['card_colors'] = null;
+        }
 
         $package = Package::create($validated);
 
@@ -125,7 +135,7 @@ class PackageController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'unique:packages,slug,' . $package->id],
             'description' => ['nullable', 'string'],
-            'type' => ['required', 'in:nfc_plain,nfc_printed,classic'],
+            'type' => ['required', 'in:nfc_card,classic'],
             'image' => ['nullable', 'image', 'max:2048'],
             'is_active' => ['boolean'],
             'display_order' => ['nullable', 'integer', 'min:0'],
@@ -151,6 +161,11 @@ class PackageController extends Controller
         // Set default values
         $validated['is_active'] = $request->has('is_active') ? true : false;
         $validated['display_order'] = $validated['display_order'] ?? 0;
+        
+        // Clean up empty card_colors array
+        if (isset($validated['card_colors']) && empty(array_filter($validated['card_colors']))) {
+            $validated['card_colors'] = null;
+        }
 
         $package->update($validated);
 
@@ -169,6 +184,9 @@ class PackageController extends Controller
      */
     public function destroy(Package $package)
     {
+        // Check if package has orders
+        $orderCount = $package->orders()->count();
+        
         // Delete image if exists
         if ($package->image) {
             Storage::disk('public')->delete($package->image);
@@ -176,8 +194,12 @@ class PackageController extends Controller
 
         $package->delete();
 
+        $message = $orderCount > 0 
+            ? "Package deleted successfully. {$orderCount} order(s) associated with this package now have no package reference."
+            : 'Package deleted successfully.';
+
         return redirect()->route('admin.packages.index')
-            ->with('success', 'Package deleted successfully.');
+            ->with('success', $message);
     }
 
     /**

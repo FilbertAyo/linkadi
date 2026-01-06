@@ -21,13 +21,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Auto-create profile when user is created
+        // Auto-create primary profile when user is created
         User::created(function (User $user) {
-            if (!$user->profile) {
+            if ($user->profiles()->count() === 0) {
                 $profile = new Profile([
                     'user_id' => $user->id,
-                    'slug' => Profile::generateUniqueSlug($user->name),
+                    'profile_name' => 'My Profile',
+                    'slug' => Profile::generateUniqueSlug($user->name, $user->id),
                     'is_public' => true,
+                    'is_primary' => true,
+                    'display_mode' => 'combined',
                 ]);
                 $profile->save();
             }

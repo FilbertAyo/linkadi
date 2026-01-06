@@ -90,26 +90,27 @@ class OrderController extends Controller
     /**
      * Mark order as paid (manual payment confirmation).
      */
-    public function markAsPaid(Request $request, Order $order, OrderPaymentService $paymentService)
+    public function markAsPaid(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'payment_method' => ['required', 'string', 'max:50'],
-            'payment_reference' => ['nullable', 'string', 'max:255'],
+            'payment_method' => ['nullable', 'string', 'max:50'],
+            'payment_reference' => ['required', 'string', 'max:255'],
         ]);
 
-        try {
-            $paymentService->markAsPaid($order, [
-                'method' => $validated['payment_method'],
-                'reference' => $validated['payment_reference'] ?? 'ADMIN_' . time(),
-                'paid_at' => now(),
-            ]);
+        $paymentService = app(\App\Services\PaymentService::class);
+        
+        $success = $paymentService->processPayment($order, [
+            'method' => $validated['payment_method'] ?? 'manual',
+            'reference' => $validated['payment_reference'],
+        ]);
 
+        if ($success) {
             return redirect()->back()
-                ->with('success', 'Order marked as paid successfully. Associated profile has been updated.');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Failed to mark order as paid: ' . $e->getMessage());
+                ->with('success', 'Order marked as paid and profiles activated successfully.');
         }
+
+        return redirect()->back()
+            ->with('error', 'Failed to process payment.');
     }
 
     /**

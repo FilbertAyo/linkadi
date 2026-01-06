@@ -29,8 +29,19 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'package_id' => ['required', 'exists:packages,id'],
-            'quantity' => ['required', 'integer', 'min:1'],
-            'shipping_address' => ['nullable', 'string', 'max:1000'],
+            'quantity' => ['required', 'integer', 'min:1', 'max:10'],
+            'subscription_years' => ['required', 'integer', 'min:1', 'max:10'],
+            'cards' => ['required_without:bulk', 'array'],
+            'cards.*.profile_id' => ['required_with:cards', 'exists:profiles,id'],
+            'cards.*.card_color' => ['required_with:cards', 'string', 'max:255'],
+            'cards.*.requires_printing' => ['nullable'],
+            'cards.*.printing_text' => ['nullable', 'string', 'max:255'],
+            'bulk' => ['required_without:cards', 'array'],
+            'bulk.profile_id' => ['required_with:bulk', 'exists:profiles,id'],
+            'bulk.card_color' => ['required_with:bulk', 'string', 'max:255'],
+            'bulk.requires_printing' => ['nullable'],
+            'bulk.printing_text' => ['nullable', 'string', 'max:255'],
+            'shipping_address' => ['required', 'string', 'max:1000'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
@@ -40,41 +51,116 @@ class OrderController extends Controller
             return back()->with('error', 'This package is not available.');
         }
 
-        // Calculate price
-        $price = $package->getPriceForQuantity($validated['quantity']);
+        // Validate minimum quantity for classic packages
+        if ($package->type === 'classic' && $validated['quantity'] < 100) {
+            return back()->withErrors(['quantity' => 'Minimum order quantity for Classic Business Cards is 100.'])->withInput();
+        }
+
+        // Determine if using bulk configuration
+        $useBulkConfig = isset($validated['bulk']) && !empty($validated['bulk']);
         
-        if ($price === null) {
-            return back()->with('error', 'Unable to calculate price for this quantity. Please contact support.');
-        }
-
-        // For classic packages, get the unit price from the tier
-        if ($package->type === 'classic') {
-            $tier = $package->activePricingTiers()
-                ->where('min_quantity', '<=', $validated['quantity'])
-                ->where(function ($query) use ($validated) {
-                    $query->whereNull('max_quantity')
-                        ->orWhere('max_quantity', '>=', $validated['quantity']);
-                })
-                ->first();
-            
-            $unitPrice = $tier ? $tier->price_per_unit : 0;
+        // Prepare card configurations
+        $cardConfigs = [];
+        $quantity = (int) $validated['quantity'];
+        
+        if ($useBulkConfig) {
+            // Apply bulk config to all cards
+            for ($i = 0; $i < $quantity; $i++) {
+                $cardConfigs[] = [
+                    'profile_id' => $validated['bulk']['profile_id'],
+                    'card_color' => $validated['bulk']['card_color'],
+                    'requires_printing' => isset($validated['bulk']['requires_printing']),
+                    'printing_text' => $validated['bulk']['printing_text'] ?? null,
+                ];
+            }
         } else {
-            $unitPrice = $package->base_price;
+            // Use individual card configurations
+            $cardConfigs = $validated['cards'] ?? [];
+            
+            // Convert requires_printing checkboxes
+            foreach ($cardConfigs as $key => $config) {
+                $cardConfigs[$key]['requires_printing'] = isset($config['requires_printing']);
+            }
         }
-
+        
+        // Validate we have the right number of configurations
+        if (count($cardConfigs) !== $quantity) {
+            return back()->withErrors(['quantity' => 'Card configuration mismatch. Please try again.'])->withInput();
+        }
+        
+        // Validate all profiles belong to user
+        $profileIds = array_column($cardConfigs, 'profile_id');
+        $userProfileCount = Auth::user()->profiles()->whereIn('id', $profileIds)->count();
+        if ($userProfileCount !== count(array_unique($profileIds))) {
+            return back()->withErrors(['cards' => 'One or more selected profiles do not belong to you.'])->withInput();
+        }
+        
+        // Calculate total pricing
+        $subscriptionYears = (int) $validated['subscription_years'];
+        $subscriptionOption = collect($package->getSubscriptionOptions())->firstWhere('years', $subscriptionYears);
+        
+        if (!$subscriptionOption) {
+            return back()->with('error', 'Invalid subscription duration selected.')->withInput();
+        }
+        
+        // Calculate base price for all cards
+        $baseSubscriptionPrice = $subscriptionOption['price'];
+        $totalBasePrice = $baseSubscriptionPrice * $quantity;
+        
+        // Calculate printing fees
+        $printingCount = collect($cardConfigs)->where('requires_printing', true)->count();
+        $totalPrintingFee = $printingCount * (float) ($package->printing_fee ?? 0);
+        
+        // Calculate totals
+        $totalPrice = $totalBasePrice + $totalPrintingFee;
+        $totalDiscount = $subscriptionOption['savings'] * $quantity;
+        
+        // Create order
         $order = Order::create([
             'user_id' => Auth::id(),
             'package_id' => $package->id,
-            'quantity' => $validated['quantity'],
-            'unit_price' => $unitPrice,
-            'total_price' => $price,
+            'profile_id' => null, // Multiple profiles
+            'quantity' => $quantity,
+            'unit_price' => $baseSubscriptionPrice,
+            'base_price' => $totalBasePrice,
+            'subscription_price' => $totalBasePrice,
+            'subscription_years' => $subscriptionYears,
+            'subscription_discount' => $totalDiscount,
+            'printing_fee' => $totalPrintingFee,
+            'design_fee' => 0,
+            'total_price' => $totalPrice,
             'status' => 'pending',
-            'shipping_address' => $validated['shipping_address'] ?? null,
+            'payment_status' => 'pending',
+            'requires_printing' => $printingCount > 0,
+            'has_design' => true,
+            'card_color' => null, // Multiple colors possible
+            'pricing_breakdown' => [
+                'subscription_option' => $subscriptionOption,
+                'quantity' => $quantity,
+                'base_per_card' => $baseSubscriptionPrice,
+                'printing_count' => $printingCount,
+                'printing_fee_per_card' => (float) ($package->printing_fee ?? 0),
+                'total_printing' => $totalPrintingFee,
+                'total_discount' => $totalDiscount,
+                'card_configurations' => $cardConfigs,
+            ],
+            'shipping_address' => $validated['shipping_address'],
             'notes' => $validated['notes'] ?? null,
         ]);
 
-        return redirect()->route('orders.show', $order)
-            ->with('success', 'Order placed successfully!');
+        // Link all profiles to this order
+        foreach ($cardConfigs as $config) {
+            $profile = \App\Models\Profile::find($config['profile_id']);
+            if ($profile && $profile->user_id === Auth::id()) {
+                $profile->order_id = $order->id;
+                $profile->package_id = $package->id;
+                $profile->status = 'pending_payment';
+                $profile->save();
+            }
+        }
+
+        return redirect()->route('dashboard.orders.payment', $order)
+            ->with('success', 'Order created successfully! Please complete payment to activate your cards.');
     }
 
     /**

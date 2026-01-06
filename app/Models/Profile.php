@@ -16,6 +16,9 @@ class Profile extends Model
      */
     protected $fillable = [
         'user_id',
+        'profile_name',
+        'display_mode',
+        'is_primary',
         'profile_type',
         'slug',
         'title',
@@ -46,6 +49,7 @@ class Profile extends Model
     {
         return [
             'is_public' => 'boolean',
+            'is_primary' => 'boolean',
             'published_at' => 'datetime',
             'expires_at' => 'datetime',
         ];
@@ -124,6 +128,23 @@ class Profile extends Model
     }
 
     /**
+     * Get the NFC cards linked to this profile.
+     */
+    public function nfcCards(): HasMany
+    {
+        return $this->hasMany(NfcCard::class);
+    }
+
+    /**
+     * Get the active NFC card for this profile.
+     */
+    public function activeNfcCard(): HasMany
+    {
+        return $this->hasMany(NfcCard::class)
+            ->whereIn('status', ['activated', 'delivered', 'shipped']);
+    }
+
+    /**
      * Get the profile image URL.
      */
     public function getProfileImageUrlAttribute(): ?string
@@ -150,13 +171,20 @@ class Profile extends Model
     /**
      * Generate a unique slug from a given string.
      */
-    public static function generateUniqueSlug(string $base): string
+    public static function generateUniqueSlug(string $base, ?int $userId = null): string
     {
         $slug = Str::slug($base);
         $originalSlug = $slug;
         $counter = 1;
 
-        while (static::where('slug', $slug)->exists()) {
+        $query = static::query();
+        
+        // If userId is provided, check uniqueness within that user's profiles
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        while ($query->where('slug', $slug)->exists()) {
             $slug = $originalSlug . '-' . $counter;
             $counter++;
         }
@@ -221,6 +249,14 @@ class Profile extends Model
     }
 
     /**
+     * Check if the profile is active (published).
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'published';
+    }
+
+    /**
      * Check if the profile is expired.
      */
     public function isExpired(): bool
@@ -245,6 +281,43 @@ class Profile extends Model
     }
 
     /**
+     * Activate profile with subscription.
+     */
+    public function activate(int $subscriptionMonths = 12): void
+    {
+        $this->status = 'published';
+        $this->published_at = $this->published_at ?? now();
+        $this->expires_at = now()->addMonths($subscriptionMonths);
+        $this->save();
+    }
+
+    /**
+     * Check if subscription is expiring soon (30 days).
+     */
+    public function isExpiringSoon(): bool
+    {
+        if (!$this->expires_at) {
+            return false;
+        }
+        return $this->expires_at->isFuture() 
+            && $this->expires_at->diffInDays(now()) <= 30;
+    }
+
+    /**
+     * Renew subscription.
+     */
+    public function renew(int $months = 12): void
+    {
+        $startDate = $this->expires_at && $this->expires_at->isFuture()
+            ? $this->expires_at
+            : now();
+            
+        $this->expires_at = $startDate->addMonths($months);
+        $this->status = 'published';
+        $this->save();
+    }
+
+    /**
      * Check if the profile can be edited.
      */
     public function canEdit(): bool
@@ -257,7 +330,48 @@ class Profile extends Model
      */
     public function isPubliclyAccessible(): bool
     {
-        return $this->isPublished() && $this->is_public && !$this->isExpired() && !$this->isSuspended();
+        // Must be published (not draft, ready, pending_payment, paid, expired, or suspended)
+        if (!$this->isPublished()) {
+            return false;
+        }
+
+        // Must have is_public flag set to true
+        if (!$this->is_public) {
+            return false;
+        }
+
+        // Must not be expired or suspended
+        if ($this->isExpired() || $this->isSuspended()) {
+            return false;
+        }
+
+        // If there's an expiration date, it must be in the future
+        if ($this->expires_at && $this->expires_at->isPast()) {
+            return false;
+        }
+
+        // If there's an order_id, the order must be paid
+        if ($this->order_id) {
+            // Load order if not already loaded
+            if (!$this->relationLoaded('order')) {
+                $this->load('order');
+            }
+            
+            if ($this->order && !$this->order->isPaymentPaid()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if profile can go public.
+     */
+    public function canBePublic(): bool
+    {
+        return in_array($this->status, ['active', 'published'])
+            && (!$this->expires_at || $this->expires_at->isFuture());
     }
 
     /**
@@ -267,10 +381,11 @@ class Profile extends Model
     {
         return match($this->status) {
             'draft' => 'gray',
-            'ready' => 'blue',
+            'ready' => 'indigo',
             'pending_payment' => 'yellow',
             'paid' => 'green',
             'published' => 'emerald',
+            'active' => 'emerald',
             'expired' => 'red',
             'suspended' => 'red',
             default => 'gray',
@@ -288,6 +403,7 @@ class Profile extends Model
             'pending_payment' => 'Pending Payment',
             'paid' => 'Paid',
             'published' => 'Published',
+            'active' => 'Active',
             'expired' => 'Expired',
             'suspended' => 'Suspended',
             default => ucfirst($this->status),
@@ -351,18 +467,6 @@ class Profile extends Model
     }
 
     /**
-     * Get the display name based on profile type.
-     */
-    public function getDisplayNameAttribute(): string
-    {
-        if ($this->isBusiness() && $this->business_name) {
-            return $this->business_name;
-        }
-        
-        return $this->user->name;
-    }
-
-    /**
      * Get the subtitle based on profile type.
      */
     public function getSubtitleAttribute(): ?string
@@ -397,5 +501,70 @@ class Profile extends Model
     public function scopeBusiness($query)
     {
         return $query->where('profile_type', 'business');
+    }
+
+    /**
+     * Check if profile displays personal information only.
+     */
+    public function displaysPersonalOnly(): bool
+    {
+        return $this->display_mode === 'personal_only';
+    }
+
+    /**
+     * Check if profile displays company information only.
+     */
+    public function displaysCompanyOnly(): bool
+    {
+        return $this->display_mode === 'company_only';
+    }
+
+    /**
+     * Check if profile displays combined information.
+     */
+    public function displaysCombined(): bool
+    {
+        return $this->display_mode === 'combined';
+    }
+
+    /**
+     * Get display name for the profile (uses profile_name, falls back to business_name or user name).
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        // First priority: profile_name (user-friendly name)
+        if ($this->profile_name) {
+            return $this->profile_name;
+        }
+        
+        // Second priority: business name for business profiles
+        if ($this->isBusiness() && $this->business_name) {
+            return $this->business_name;
+        }
+        
+        // Fallback: user name with profile type
+        return $this->user->name . ' - ' . ucfirst($this->profile_type ?? 'individual');
+    }
+
+    /**
+     * Scope a query to only include primary profiles.
+     */
+    public function scopePrimary($query)
+    {
+        return $query->where('is_primary', true);
+    }
+
+    /**
+     * Set this profile as primary and unset others for the same user.
+     */
+    public function setAsPrimary(): void
+    {
+        // Unset other primary profiles for this user
+        static::where('user_id', $this->user_id)
+            ->where('id', '!=', $this->id)
+            ->update(['is_primary' => false]);
+        
+        // Set this as primary
+        $this->update(['is_primary' => true]);
     }
 }

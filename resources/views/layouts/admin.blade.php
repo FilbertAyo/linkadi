@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50 dark:bg-gray-900">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,20 +14,20 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full bg-gray-50 dark:bg-gray-900">
+<body class="h-full bg-gray-50">
     <!-- Include Navigation Component -->
     @include('layouts.navigation')
 
-    <div class="flex overflow-hidden bg-gray-50 dark:bg-gray-900">
+    <div class="flex overflow-hidden bg-gray-50">
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed z-30 top-4 left-8 bottom-4 hidden lg:flex flex-shrink-0 flex-col w-64 transition-width duration-75 bg-gray-900 dark:bg-gray-900 border-r border-gray-700 rounded-lg shadow-lg" aria-label="Sidebar">
+        <aside id="sidebar" class="fixed z-30 top-4 left-8 bottom-4 hidden lg:flex flex-shrink-0 flex-col w-64 transition-width duration-75 bg-gray-900 border-r border-gray-700 rounded-lg shadow-lg" aria-label="Sidebar">
             <div class="relative flex-1 flex flex-col min-h-0 h-full">
                 <!-- Company Logo Section -->
                 <div class="px-6 py-6 border-b border-gray-700">
                     <div class="flex items-center space-x-3">
                         <div class="flex-shrink-0">
                             <a href="{{ route('admin.dashboard') }}" class="flex items-center">
-                                <!-- <img src="{{ asset('images/logo-dark.svg') }}" class="h-8 w-8 dark:hidden" alt="LI Logo" /> -->
+                                <!-- <img src="{{ asset('images/logo-dark.svg') }}" class="h-8 w-8" alt="LI Logo" /> -->
                                 <img src="{{ asset('images/dark-white.svg') }}" class="h-10" alt="LI Logo" />
                             </a>
                         </div>
@@ -102,22 +102,22 @@
         <div class="bg-gray-900 opacity-50 hidden fixed top-16 left-0 right-0 bottom-0 z-20 lg:hidden" id="sidebarBackdrop"></div>
 
         <!-- Main content -->
-        <div id="main-content" class="h-full w-full bg-gray-50 dark:bg-gray-900 relative overflow-y-auto lg:ml-[18rem] lg:mr-8 pt-16">
+        <div id="main-content" class="h-full w-full bg-gray-50 relative overflow-y-auto lg:ml-[18rem] lg:mr-8 pt-16">
             <main class="p-4 sm:p-6 lg:p-8">
                 @if(session('success'))
-                    <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg dark:bg-green-800 dark:border-green-600 dark:text-green-200">
+                    <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
                         {{ session('success') }}
                     </div>
                 @endif
 
                 @if(session('error'))
-                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg dark:bg-red-800 dark:border-red-600 dark:text-red-200">
+                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
                         {{ session('error') }}
                     </div>
                 @endif
 
                 @if($errors->any())
-                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg dark:bg-red-800 dark:border-red-600 dark:text-red-200">
+                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
                         <ul class="list-disc list-inside">
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -164,52 +164,7 @@
         }
     </script>
 
-    <!-- Dark mode toggle script -->
-    <script>
-        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-
-        // Change the icons inside the button based on previous settings
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            themeToggleLightIcon.classList.remove('hidden');
-            document.documentElement.classList.add('dark');
-        } else {
-            themeToggleDarkIcon.classList.remove('hidden');
-            document.documentElement.classList.remove('dark');
-        }
-
-        var themeToggleBtn = document.getElementById('theme-toggle');
-
-        if (themeToggleBtn) {
-            themeToggleBtn.addEventListener('click', function() {
-                // toggle icons inside button
-                themeToggleDarkIcon.classList.toggle('hidden');
-                themeToggleLightIcon.classList.toggle('hidden');
-
-                // if set via local storage previously
-                if (localStorage.getItem('color-theme')) {
-                    if (localStorage.getItem('color-theme') === 'light') {
-                        document.documentElement.classList.add('dark');
-                        localStorage.setItem('color-theme', 'dark');
-                    } else {
-                        document.documentElement.classList.remove('dark');
-                        localStorage.setItem('color-theme', 'light');
-                    }
-
-                // if NOT set via local storage previously
-                } else {
-                    if (document.documentElement.classList.contains('dark')) {
-                        document.documentElement.classList.remove('dark');
-                        localStorage.setItem('color-theme', 'light');
-                    } else {
-                        document.documentElement.classList.add('dark');
-                        localStorage.setItem('color-theme', 'dark');
-                    }
-                }
-            });
-        }
-    </script>
-
+    
     <!-- Alpine.js for dropdowns -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>

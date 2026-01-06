@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
@@ -20,6 +21,12 @@ class Order extends Model
         'profile_id',
         'quantity',
         'unit_price',
+        'base_price',
+        'subscription_price',
+        'subscription_years',
+        'subscription_discount',
+        'printing_fee',
+        'design_fee',
         'total_price',
         'status',
         'payment_status',
@@ -28,6 +35,10 @@ class Order extends Model
         'paid_at',
         'shipping_address',
         'notes',
+        'requires_printing',
+        'has_design',
+        'card_color',
+        'pricing_breakdown',
     ];
 
     /**
@@ -40,10 +51,19 @@ class Order extends Model
         return [
             'quantity' => 'integer',
             'unit_price' => 'decimal:2',
+            'base_price' => 'decimal:2',
+            'subscription_price' => 'decimal:2',
+            'subscription_years' => 'integer',
+            'subscription_discount' => 'decimal:2',
+            'printing_fee' => 'decimal:2',
+            'design_fee' => 'decimal:2',
             'total_price' => 'decimal:2',
             'status' => 'string',
             'payment_status' => 'string',
             'paid_at' => 'datetime',
+            'requires_printing' => 'boolean',
+            'has_design' => 'boolean',
+            'pricing_breakdown' => 'array',
         ];
     }
 
@@ -64,11 +84,11 @@ class Order extends Model
     }
 
     /**
-     * Get the profile for this order.
+     * Get the NFC cards for this order.
      */
-    public function profile(): BelongsTo
+    public function nfcCards(): HasMany
     {
-        return $this->belongsTo(Profile::class);
+        return $this->hasMany(NfcCard::class);
     }
 
     /**

@@ -22,7 +22,7 @@ class PublicProfileController extends Controller
     public function show(string $slug): View|Response
     {
         $profile = Profile::where('slug', $slug)
-            ->with(['user', 'socialLinks'])
+            ->with(['user', 'socialLinks', 'order'])
             ->firstOrFail();
 
         // Check if profile is publicly accessible
@@ -42,7 +42,7 @@ class PublicProfileController extends Controller
     public function downloadVCard(string $slug): Response
     {
         $profile = Profile::where('slug', $slug)
-            ->with(['user', 'contacts'])
+            ->with(['user', 'contacts', 'order'])
             ->firstOrFail();
 
         // Check if profile is publicly accessible
