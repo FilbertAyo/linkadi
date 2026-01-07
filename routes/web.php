@@ -81,6 +81,16 @@ Route::prefix('profile/builder')->name('profile.builder.')->middleware(['auth'])
         ->name('edit');
 });
 
+// Profile Package Selection routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('profile/{profile}/select-package', [App\Http\Controllers\Client\ProfilePackageController::class, 'selectPackage'])
+        ->name('profile.select-package');
+    Route::get('profile/{profile}/order/{package}', [App\Http\Controllers\Client\ProfilePackageController::class, 'orderForm'])
+        ->name('profile.order-form');
+    Route::post('profile/{profile}/create-order', [App\Http\Controllers\Client\ProfilePackageController::class, 'createOrder'])
+        ->name('profile.create-order');
+});
+
 // Profile publishing routes
 Route::middleware(['auth'])->group(function () {
     Route::post('profile/publish', [App\Http\Controllers\ProfileController::class, 'publish'])

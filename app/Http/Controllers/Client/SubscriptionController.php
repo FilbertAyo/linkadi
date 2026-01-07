@@ -90,7 +90,7 @@ class SubscriptionController extends Controller
             
             $message = $years > 1 ? "Renewal order created for {$years} years. Please complete payment." : 'Renewal order created. Please complete payment.';
             
-            return redirect()->route('client.orders.payment', $order)
+            return redirect()->route('dashboard.orders.payment', $order)
                 ->with('success', $message);
         } catch (\Exception $e) {
             Log::error('Failed to create renewal order', [
@@ -136,7 +136,7 @@ class SubscriptionController extends Controller
             $profileCount = count($validated['profile_ids']);
             $discountMsg = $profileCount >= 3 || $years >= 2 ? 'Discount applied!' : '';
             
-            return redirect()->route('client.orders.payment', $order)
+            return redirect()->route('dashboard.orders.payment', $order)
                 ->with('success', "Bulk renewal order created for {$profileCount} " . \Illuminate\Support\Str::plural('profile', $profileCount) . " ({$years} " . \Illuminate\Support\Str::plural('year', $years) . "). {$discountMsg} Please complete payment.");
         } catch (\Exception $e) {
             Log::error('Failed to create bulk renewal order', [

@@ -205,7 +205,7 @@ class CardController extends Controller
             });
             
             // Redirect to payment page
-            return redirect()->route('client.orders.payment', $order)
+            return redirect()->route('dashboard.orders.payment', $order)
                 ->with('success', 'Order created successfully! Please complete payment to activate your profiles.');
                 
         } catch (\Exception $e) {
