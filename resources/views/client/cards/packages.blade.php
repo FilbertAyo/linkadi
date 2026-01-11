@@ -1,2 +1,81 @@
-<x-client-layout> <div class="space-y-6"> <!-- Page Header --> <div class="md:flex md:items-center md:justify-between"> <div class="min-w-0 flex-1"> <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"> Order NFC Cards </h2> <p class="mt-1 text-sm text-gray-500"> Choose a package and link your profiles to physical NFC cards </p> </div> </div> <!-- Draft Profiles Banner --> @if($draftProfiles->count() > 0) <div class="rounded-lg bg-blue-50 p-4 border border-blue-200"> <div class="flex"> <div class="flex-shrink-0"> <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor"> <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /> </svg> </div> <div class="ml-3 flex-1"> <h3 class="text-sm font-medium text-blue-800"> You have {{ $draftProfiles->count() }} draft {{ Str::plural('profile', $draftProfiles->count()) }} </h3> <p class="mt-1 text-sm text-blue-700"> Order an NFC card to activate your {{ Str::plural('profile', $draftProfiles->count()) }} and make {{ $draftProfiles->count() === 1 ? 'it' : 'them' }} publicly accessible. </p> </div> </div> </div> @elseif($userProfiles->isEmpty()) <div class="rounded-lg bg-yellow-50 p-4 border border-yellow-200"> <div class="flex"> <div class="flex-shrink-0"> <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor"> <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /> </svg> </div> <div class="ml-3 flex-1"> <h3 class="text-sm font-medium text-yellow-800"> No profiles yet </h3> <p class="mt-1 text-sm text-yellow-700"> You need to create a profile before ordering an NFC card. </p> <div class="mt-3"> <a href="{{ route('profile.builder.create') }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200"> Create Profile </a> </div> </div> </div> </div> @endif <!-- Package Grid --> @if($packages->isEmpty()) <div class="text-center py-12"> <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path> </svg> <h3 class="mt-2 text-sm font-medium text-gray-900">No packages available</h3> <p class="mt-1 text-sm text-gray-500"> NFC card packages are currently unavailable. Please check back later. </p> </div> @else <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2"> @foreach($packages as $package) <div class="relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow"> <!-- Package Image --> @if($package->image) <div class="aspect-w-16 aspect-h-9 bg-gray-200"> <img src="{{ $package->image_url }}" alt="{{ $package->name }}" class="h-48 w-full object-cover"> </div> @endif <!-- Package Content --> <div class="flex flex-1 flex-col p-6"> <div class="flex-1"> <h3 class="text-xl font-semibold text-gray-900"> {{ $package->name }} </h3> @if($package->description) <p class="mt-2 text-sm text-gray-500"> {{ $package->description }} </p> @endif <!-- Pricing --> <div class="mt-4"> <div class="flex items-baseline"> <span class="text-3xl font-bold text-gray-900"> {{ number_format($package->base_price) }} </span> <span class="ml-1 text-lg font-medium text-gray-500"> TZS </span> </div> <p class="mt-1 text-sm text-gray-500"> Includes 1-year subscription </p> @if($package->subscription_renewal_price) <p class="text-xs text-gray-400"> Renewal: {{ number_format($package->subscription_renewal_price) }} TZS/year </p> @endif </div> <!-- Features --> @if($package->features && count($package->features) > 0) <ul class="mt-4 space-y-2"> @foreach($package->features as $feature) <li class="flex items-start"> <svg class="h-5 w-5 flex-shrink-0 text-green-500" fill="currentColor" viewBox="0 0 20 20"> <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /> </svg> <span class="ml-2 text-sm text-gray-600">{{ $feature }}</span> </li> @endforeach </ul> @endif </div> <!-- Action Button --> <div class="mt-6"> @if($userProfiles->isEmpty()) <button disabled class="w-full px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"> Create Profile First </button> @else <a href="{{ route('dashboard.cards.checkout', $package) }}" class="block w-full text-center px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-medium transition-colors"> Select Package </a> @endif </div> </div> </div> @endforeach </div> @endif <!-- Info Section --> <div class="rounded-lg bg-gray-50 p-6 border border-gray-200"> <h3 class="text-lg font-medium text-gray-900 mb-4"> How it works </h3> <div class="grid grid-cols-1 md:grid-cols-3 gap-4"> <div class="flex items-start"> <div class="flex-shrink-0"> <div class="flex items-center justify-center h-10 w-10 rounded-md bg-brand-600 text-white"> 1 </div> </div> <div class="ml-4"> <h4 class="text-sm font-medium text-gray-900">Select Package</h4> <p class="mt-1 text-sm text-gray-500"> Choose between plain or printed NFC cards </p> </div> </div> <div class="flex items-start"> <div class="flex-shrink-0"> <div class="flex items-center justify-center h-10 w-10 rounded-md bg-brand-600 text-white"> 2 </div> </div> <div class="ml-4"> <h4 class="text-sm font-medium text-gray-900">Link Profiles</h4> <p class="mt-1 text-sm text-gray-500"> Choose which profile(s) to link to your card(s) </p> </div> </div> <div class="flex items-start"> <div class="flex-shrink-0"> <div class="flex items-center justify-center h-10 w-10 rounded-md bg-brand-600 text-white"> 3 </div> </div> <div class="ml-4"> <h4 class="text-sm font-medium text-gray-900">Complete Payment</h4> <p class="mt-1 text-sm text-gray-500"> Pay and receive your card within 5-7 business days </p> </div> </div> </div> </div> </div>
-</x-client-layout> 
+<x-client-layout>
+    <div class="space-y-6"> <!-- Page Header -->
+        <div class="md:flex md:items-center md:justify-between">
+            <div class="min-w-0 flex-1">
+                <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"> Order NFC Cards </h2>
+                <p class="mt-1 text-sm text-gray-500"> Choose a package and link your profiles to physical NFC cards </p>
+            </div>
+        </div> <!-- Draft Profiles Banner --> @if($draftProfiles->count() > 0) <div class="rounded-lg bg-blue-50 p-4 border border-blue-200">
+            <div class="flex">
+                <div class="flex-shrink-0"> <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg> </div>
+                <div class="ml-3 flex-1">
+                    <h3 class="text-sm font-medium text-blue-800"> You have {{ $draftProfiles->count() }} draft {{ Str::plural('profile', $draftProfiles->count()) }} </h3>
+                    <p class="mt-1 text-sm text-blue-700"> Order an NFC card to activate your {{ Str::plural('profile', $draftProfiles->count()) }} and make {{ $draftProfiles->count() === 1 ? 'it' : 'them' }} publicly accessible. </p>
+                </div>
+            </div>
+        </div> @elseif($userProfiles->isEmpty()) <div class="rounded-lg bg-yellow-50 p-4 border border-yellow-200">
+            <div class="flex">
+                <div class="flex-shrink-0"> <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg> </div>
+                <div class="ml-3 flex-1">
+                    <h3 class="text-sm font-medium text-yellow-800"> No profiles yet </h3>
+                    <p class="mt-1 text-sm text-yellow-700"> You need to create a profile before ordering an NFC card. </p>
+                    <div class="mt-3"> <a href="{{ route('profile.builder.create') }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200"> Create Profile </a> </div>
+                </div>
+            </div>
+        </div> @endif <!-- Package Grid --> @if($packages->isEmpty()) <div class="text-center py-12"> <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No packages available</h3>
+            <p class="mt-1 text-sm text-gray-500"> NFC card packages are currently unavailable. Please check back later. </p>
+        </div> @else <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2"> @foreach($packages as $package) <div class="relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow"> <!-- Package Image --> @if($package->image) <div class="aspect-w-16 aspect-h-9 bg-gray-200"> <img src="{{ $package->image_url }}" alt="{{ $package->name }}" class="h-48 w-full object-cover"> </div> @endif <!-- Package Content -->
+                <div class="flex flex-1 flex-col p-6">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold text-gray-900"> {{ $package->name }} </h3> @if($package->description) <p class="mt-2 text-sm text-gray-500"> {{ $package->description }} </p> @endif <!-- Pricing -->
+                        <div class="mt-4">
+                            <div class="flex items-baseline"> <span class="text-3xl font-bold text-gray-900"> {{ number_format($package->base_price) }} </span> <span class="ml-1 text-lg font-medium text-gray-500"> TZS </span> </div>
+                            <p class="mt-1 text-sm text-gray-500"> Includes 1-year subscription </p> @if($package->subscription_renewal_price) <p class="text-xs text-gray-400"> Renewal: {{ number_format($package->subscription_renewal_price) }} TZS/year </p> @endif
+                        </div> <!-- Features --> @if($package->features && count($package->features) > 0) <ul class="mt-4 space-y-2"> @foreach($package->features as $feature) <li class="flex items-start"> <svg class="h-5 w-5 flex-shrink-0 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg> <span class="ml-2 text-sm text-gray-600">{{ $feature }}</span> </li> @endforeach </ul> @endif
+                    </div> <!-- Action Button -->
+                    <div class="mt-6"> @if($userProfiles->isEmpty()) <button disabled class="w-full px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"> Create Profile First </button> @else <a href="{{ route('dashboard.cards.checkout', $package) }}" class="block w-full text-center px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-medium transition-colors"> Select Package </a> @endif </div>
+                </div>
+            </div> @endforeach </div> @endif <!-- Info Section -->
+        <div class="rounded-lg bg-gray-50 p-6 border border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900 mb-4"> How it works </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center justify-center h-10 w-10 rounded-md bg-brand-600 text-white"> 1 </div>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-sm font-medium text-gray-900">Select Package</h4>
+                        <p class="mt-1 text-sm text-gray-500"> Choose between plain or printed NFC cards </p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center justify-center h-10 w-10 rounded-md bg-brand-600 text-white"> 2 </div>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-sm font-medium text-gray-900">Link Profiles</h4>
+                        <p class="mt-1 text-sm text-gray-500"> Choose which profile(s) to link to your card(s) </p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center justify-center h-10 w-10 rounded-md bg-brand-600 text-white"> 3 </div>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-sm font-medium text-gray-900">Complete Payment</h4>
+                        <p class="mt-1 text-sm text-gray-500"> Pay and receive your card within 5-7 business days </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-client-layout>

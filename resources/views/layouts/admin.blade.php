@@ -20,7 +20,7 @@
 
     <div class="flex overflow-hidden bg-gray-50">
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed z-30 top-4 left-8 bottom-4 hidden lg:flex flex-shrink-0 flex-col w-64 transition-width duration-75 bg-gray-900 border-r border-gray-700 rounded-lg shadow-lg" aria-label="Sidebar">
+        <aside id="sidebar" class="fixed z-30 top-16 left-0 bottom-0 hidden lg:flex flex-shrink-0 flex-col w-64 transition-all duration-300 ease-in-out bg-gray-900 border-r border-gray-700 shadow-lg lg:top-4 lg:left-8 lg:rounded-lg" aria-label="Sidebar">
             <div class="relative flex-1 flex flex-col min-h-0 h-full">
                 <!-- Company Logo Section -->
                 <div class="px-6 py-6 border-b border-gray-700">
@@ -28,10 +28,9 @@
                         <div class="flex-shrink-0">
                             <a href="{{ route('admin.dashboard') }}" class="flex items-center">
                                 <!-- <img src="{{ asset('images/logo-dark.svg') }}" class="h-8 w-8" alt="LI Logo" /> -->
-                                <img src="{{ asset('images/dark-white.svg') }}" class="h-10" alt="LI Logo" />
+                                <img src="{{ asset('images/logo-white.svg') }}" class="h-10" alt="LI Logo" />
                             </a>
                         </div>
-                   
                     </div>
                 </div>
 
@@ -125,14 +124,14 @@
                 sidebar.classList.remove('hidden');
                 sidebar.classList.add('flex');
                 sidebarBackdrop.classList.remove('hidden');
-                toggleSidebarMobileHamburger.classList.add('hidden');
-                toggleSidebarMobileClose.classList.remove('hidden');
+                if (toggleSidebarMobileHamburger) toggleSidebarMobileHamburger.classList.add('hidden');
+                if (toggleSidebarMobileClose) toggleSidebarMobileClose.classList.remove('hidden');
             } else {
                 sidebar.classList.add('hidden');
                 sidebar.classList.remove('flex');
                 sidebarBackdrop.classList.add('hidden');
-                toggleSidebarMobileHamburger.classList.remove('hidden');
-                toggleSidebarMobileClose.classList.add('hidden');
+                if (toggleSidebarMobileHamburger) toggleSidebarMobileHamburger.classList.remove('hidden');
+                if (toggleSidebarMobileClose) toggleSidebarMobileClose.classList.add('hidden');
             }
         }
 

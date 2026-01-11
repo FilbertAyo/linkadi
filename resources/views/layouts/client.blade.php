@@ -59,14 +59,14 @@
                 sidebar.classList.remove('hidden');
                 sidebar.classList.add('flex');
                 sidebarBackdrop.classList.remove('hidden');
-                toggleSidebarMobileHamburger.classList.add('hidden');
-                toggleSidebarMobileClose.classList.remove('hidden');
+                if (toggleSidebarMobileHamburger) toggleSidebarMobileHamburger.classList.add('hidden');
+                if (toggleSidebarMobileClose) toggleSidebarMobileClose.classList.remove('hidden');
             } else {
                 sidebar.classList.add('hidden');
                 sidebar.classList.remove('flex');
                 sidebarBackdrop.classList.add('hidden');
-                toggleSidebarMobileHamburger.classList.remove('hidden');
-                toggleSidebarMobileClose.classList.add('hidden');
+                if (toggleSidebarMobileHamburger) toggleSidebarMobileHamburger.classList.remove('hidden');
+                if (toggleSidebarMobileClose) toggleSidebarMobileClose.classList.add('hidden');
             }
         }
 
@@ -74,8 +74,13 @@
             toggleSidebarMobileEl.addEventListener('click', toggleSidebarMobile);
         }
 
+        const sidebarCloseButton = document.getElementById('sidebarCloseButton');
+        if (sidebarCloseButton) {
+            sidebarCloseButton.addEventListener('click', toggleSidebarMobile);
+        }
+
         if (sidebarBackdrop) {
-sidebarBackdrop.addEventListener('click', toggleSidebarMobile);
+            sidebarBackdrop.addEventListener('click', toggleSidebarMobile);
         }
     </script>
 

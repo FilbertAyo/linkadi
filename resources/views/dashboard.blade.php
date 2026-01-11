@@ -80,7 +80,7 @@
                     <div>
                         <h3 class="text-xl font-bold text-gray-900">Your Digital Profiles</h3>
                         <p class="text-base font-normal text-gray-500"> Manage your profiles. Each profile can be linked to a different NFC card. </p>
-                    </div> <a href="{{ route('profile.builder.create') }}" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"> + Create Profile </a>
+                    </div> <a href="{{ route('profile.builder.create') }}" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"> + </a>
                 </div> @if (Auth::user()->profiles()->count() > 0) <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> @foreach (Auth::user()->profiles as $profile) @php $statusColor = $profile->status_badge_color; @endphp <div class="p-4 border border-gray-200 rounded-lg hover:border-brand-300 transition-colors {{ $profile->is_primary ? 'bg-brand-50 border-brand-300' : '' }}">
                         <div class="flex items-start justify-between mb-3">
                             <div class="flex-1">

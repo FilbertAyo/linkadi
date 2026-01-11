@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
                 $profile = new Profile([
                     'user_id' => $user->id,
                     'profile_name' => 'My Profile',
-                    'slug' => Profile::generateUniqueSlug($user->name, $user->id),
+                    'slug' => Profile::generateUniqueSlug($user->name),
                     'is_public' => true,
                     'is_primary' => true,
                     'display_mode' => 'combined',

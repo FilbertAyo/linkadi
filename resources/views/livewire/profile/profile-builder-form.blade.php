@@ -72,7 +72,7 @@ new class extends Component
             $profile = Auth::user()->profiles()->find($this->profileId);
             if ($profile) {
                 $this->profile_name = $profile->profile_name ?? '';
-                $this->slug = $profile->slug ?? '';
+                $this->slug = $profile->slug ?? ''; // Keep existing slug for display only
                 $this->display_mode = $profile->display_mode ?? 'combined';
                 
                 // Personal fields
@@ -126,6 +126,18 @@ new class extends Component
         $this->showPreview = !$this->showPreview;
     }
     
+    /**
+     * Auto-generate slug from profile_name when creating a new profile.
+     * For existing profiles, slug remains unchanged.
+     */
+    public function updatedProfileName(): void
+    {
+        // Only auto-generate slug for new profiles
+        if ($this->isCreatingNew && !empty($this->profile_name)) {
+            $this->slug = Profile::generateUniqueSlug($this->profile_name);
+        }
+    }
+    
     public function addSocialLink(): void
     {
         $this->socialLinks[] = [
@@ -145,7 +157,6 @@ new class extends Component
     {
         $rules = [
             'profile_name' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/'],
             'display_mode' => ['required', 'in:personal_only,company_only,combined'],
             'is_public' => ['boolean'],
         ];
@@ -185,22 +196,21 @@ new class extends Component
         
         $validated = $this->validate($rules);
         
-        // Check slug uniqueness
-        $slugQuery = Profile::where('slug', $validated['slug']);
-        if ($this->profileId) {
-            $slugQuery->where('id', '!=', $this->profileId);
-        }
-        $slugQuery->where('user_id', Auth::id());
-        
-        if ($slugQuery->exists()) {
-            $this->addError('slug', 'This slug is already taken for one of your profiles.');
-            return;
+        // Auto-generate slug from profile_name
+        // For new profiles: generate unique slug
+        // For existing profiles: keep the existing slug (slug is not editable)
+        if ($this->isCreatingNew) {
+            $slug = Profile::generateUniqueSlug($validated['profile_name']);
+        } else {
+            // For existing profiles, use the current slug (don't allow changes)
+            $profile = Auth::user()->profiles()->findOrFail($this->profileId);
+            $slug = $profile->slug;
         }
         
         $data = [
             'user_id' => Auth::id(),
             'profile_name' => $validated['profile_name'],
-            'slug' => $validated['slug'],
+            'slug' => $slug,
             'display_mode' => $validated['display_mode'],
             'is_public' => $validated['is_public'] ?? true,
             'status' => 'draft',
@@ -400,17 +410,28 @@ new class extends Component
                     </p>
                 </div>
 
-                <!-- Profile Slug -->
+                <!-- Profile Slug (Read-only) -->
                 <div>
                     <x-input-label for="slug" :value="__('Profile URL Slug')" />
                     <div class="mt-1 flex rounded-md shadow-sm">
                         <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
                             {{ config('app.url') }}/p/
                         </span>
-                        <x-text-input wire:model="slug" id="slug" type="text" class="block w-full rounded-none rounded-r-md border-gray-300" required />
+                        <x-text-input 
+                            wire:model="slug" 
+                            id="slug" 
+                            type="text" 
+                            class="block w-full rounded-none rounded-r-md border-gray-300 bg-gray-50 cursor-not-allowed" 
+                            readonly 
+                        />
                     </div>
-                    <x-input-error class="mt-2" :messages="$errors->get('slug')" />
-                    <p class="mt-1 text-xs text-gray-500">Only lowercase letters, numbers, and hyphens allowed</p>
+                    <p class="mt-1 text-xs text-gray-500">
+                        @if($isCreatingNew)
+                            The URL slug is automatically generated from your profile name and will be globally unique.
+                        @else
+                            The URL slug cannot be changed after creation.
+                        @endif
+                    </p>
                 </div>
 
                 <!-- Images Section -->

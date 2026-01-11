@@ -6,6 +6,15 @@
                 </a>
                 <div class="flex items-center lg:order-2">
                     @auth
+                    <!-- Sidebar Toggle Button (Mobile) -->
+                    <button id="toggleSidebarMobile" type="button" class="p-2 ml-1 text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 mr-2" aria-label="Toggle sidebar">
+                        <svg id="toggleSidebarMobileHamburger" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                        <svg id="toggleSidebarMobileClose" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                    <!-- User dropdown -->
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" class="flex items-center text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 p-2">

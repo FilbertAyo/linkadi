@@ -184,8 +184,9 @@ class Profile extends Model
 
     /**
      * Generate a unique slug from a given string.
+     * Slugs are globally unique across all profiles.
      */
-    public static function generateUniqueSlug(string $base, ?int $userId = null): string
+    public static function generateUniqueSlug(string $base, ?int $excludeProfileId = null): string
     {
         $slug = Str::slug($base);
         $originalSlug = $slug;
@@ -193,9 +194,9 @@ class Profile extends Model
 
         $query = static::query();
         
-        // If userId is provided, check uniqueness within that user's profiles
-        if ($userId) {
-            $query->where('user_id', $userId);
+        // If profileId is provided, exclude it from uniqueness check (for updates)
+        if ($excludeProfileId) {
+            $query->where('id', '!=', $excludeProfileId);
         }
 
         while ($query->where('slug', $slug)->exists()) {

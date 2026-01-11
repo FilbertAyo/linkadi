@@ -94,14 +94,17 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'payment_method' => ['nullable', 'string', 'max:50'],
-            'payment_reference' => ['required', 'string', 'max:255'],
+            'payment_reference' => ['nullable', 'string', 'max:255'],
         ]);
+
+        // Generate a default payment reference if none provided
+        $paymentReference = $validated['payment_reference'] ?? 'MANUAL-' . $order->id . '-' . now()->format('YmdHis');
 
         $paymentService = app(\App\Services\PaymentService::class);
         
         $success = $paymentService->processPayment($order, [
             'method' => $validated['payment_method'] ?? 'manual',
-            'reference' => $validated['payment_reference'],
+            'reference' => $paymentReference,
         ]);
 
         if ($success) {
