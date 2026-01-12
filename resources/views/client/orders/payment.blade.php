@@ -149,13 +149,7 @@
                 <!-- Manual Payment -->
                 <div class="border-2 border-brand-500 rounded-lg p-6 bg-brand-50">
                     <div class="flex items-start">
-                        <div class="flex-shrink-0">
-                            <div class="h-12 w-12 rounded-lg bg-brand-100 flex items-center justify-center">
-                                <svg class="h-6 w-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                                </svg>
-                            </div>
-                        </div>
+                      
                         <div class="ml-4 flex-1">
                             <h4 class="text-lg font-semibold text-gray-900 mb-2">Manual Payment</h4>
                             <p class="text-sm text-gray-600 mb-4">

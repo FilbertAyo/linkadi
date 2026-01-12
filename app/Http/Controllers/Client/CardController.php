@@ -41,9 +41,11 @@ class CardController extends Controller
                 ->with('error', 'This package is not available.');
         }
         
-        // Get user's profiles that can be linked
+        // Get user's profiles that can be linked (not in orders, not linked to packages, no NFC cards)
         $availableProfiles = Auth::user()->profiles()
-            ->whereIn('status', ['draft', 'pending_payment'])
+            ->whereNull('order_id')
+            ->whereNull('package_id')
+            ->whereDoesntHave('nfcCards')
             ->get();
         
         // If no profiles, redirect to create one

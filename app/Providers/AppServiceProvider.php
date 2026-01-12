@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
                     'slug' => Profile::generateUniqueSlug($user->name),
                     'is_public' => true,
                     'is_primary' => true,
-                    'display_mode' => 'combined',
+                    'display_mode' => 'personal_only',
                 ]);
                 $profile->save();
             }

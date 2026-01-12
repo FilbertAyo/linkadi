@@ -80,7 +80,7 @@
                             </select>
                         </div>
 
-                        @if($package->printing_fee > 0)
+                        <!-- @if($package->printing_fee > 0)
                             <div>
                                 <label class="flex items-start">
                                     <input type="checkbox" name="requires_printing" value="1" id="requiresPrinting" class="rounded border-gray-300 text-brand-600 mt-0.5" onchange="updatePrice()">
@@ -92,7 +92,7 @@
                                     </span>
                                 </label>
                             </div>
-                        @endif
+                        @endif -->
                     </div>
                 </div>
 

@@ -215,7 +215,7 @@
                     </ul>
                     @endif
 
-                    <a href="{{ route('packages.show', $package->slug) }}" class="text-white bg-brand-600 hover:bg-brand-700 focus:ring-4 focus:ring-brand-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                    <a href="{{ route('dashboard.cards.packages') }}" class="text-white bg-brand-600 hover:bg-brand-700 focus:ring-4 focus:ring-brand-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                         @auth
                         Order Now
                         @else
