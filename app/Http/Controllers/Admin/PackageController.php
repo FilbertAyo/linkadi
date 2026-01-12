@@ -140,6 +140,11 @@ class PackageController extends Controller
             'is_active' => ['boolean'],
             'display_order' => ['nullable', 'integer', 'min:0'],
             'base_price' => ['nullable', 'numeric', 'min:0'],
+            'subscription_renewal_price' => ['nullable', 'numeric', 'min:0'],
+            'printing_fee' => ['nullable', 'numeric', 'min:0'],
+            'design_fee' => ['nullable', 'numeric', 'min:0'],
+            'card_colors' => ['nullable', 'array'],
+            'card_colors.*' => ['string', 'max:255'],
             'features' => ['nullable', 'array'],
             'features.*' => ['string', 'max:255'],
         ]);
