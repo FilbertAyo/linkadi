@@ -26,18 +26,20 @@ class DatabaseSeeder extends Seeder
 
         // Create admin user
         $admin = User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
+            'name' => 'Soscom technologies',
+            'email' => 'soscomtechnologies@gmail.com',
+            'password' => Hash::make('Soscom@2026!!'),
         ]);
         $admin->assignRole('admin');
 
         // Create client user
         $client = User::factory()->create([
             'name' => 'Client User',
-            'email' => 'client@example.com',
+            'email' => 'client00@example.com',
             'password' => Hash::make('password'),
         ]);
         $client->assignRole('client');
     }
 }
+
+
