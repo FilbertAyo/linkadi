@@ -5,6 +5,7 @@
     let printingFee = 0;
     let subscriptionOptions = [];
     let profiles = [];
+    let availableColors = [];
     let useBulkConfig = false;
 
     // Initialize the checkout functionality with configuration data
@@ -12,6 +13,7 @@
         printingFee = config.printingFee || 0;
         subscriptionOptions = config.subscriptionOptions || [];
         profiles = config.profiles || [];
+        availableColors = config.availableColors || [];
 
         // Initialize on DOM ready
         if (document.readyState === 'loading') {
@@ -86,8 +88,10 @@
 
     function generateCardFields(prefix, index) {
         const profileOpts = profiles.map(p => `<option value="${p.id}">${p.profile_name || 'Unnamed'} (${p.slug})</option>`).join('');
-        const colors = ['black', 'white', 'silver', 'gold', 'blue'];
-        const colorOptions = colors.map(c => `<option value="${c}" ${index === 0 && c === 'black' ? 'selected' : ''}>${c.charAt(0).toUpperCase() + c.slice(1)}</option>`).join('');
+        // Use available colors from package, fallback to default colors if none are set
+        const colors = availableColors.length > 0 ? availableColors : ['black', 'white', 'silver', 'gold', 'blue'];
+        const defaultColor = colors.length > 0 ? colors[0] : 'black';
+        const colorOptions = colors.map(c => `<option value="${c}" ${index === 0 && c === defaultColor ? 'selected' : ''}>${c.charAt(0).toUpperCase() + c.slice(1)}</option>`).join('');
 
         return `
             <div class="mb-3">

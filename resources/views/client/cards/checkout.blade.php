@@ -195,7 +195,8 @@
             initCardCheckout({
                 printingFee: {{ $package->printing_fee ?? 0 }},
                 subscriptionOptions: @json($subscriptionOptions),
-                profiles: @json($availableProfiles->values())
+                profiles: @json($availableProfiles->values()),
+                availableColors: @json($package->getAvailableCardColors())
             });
         }
     </script>

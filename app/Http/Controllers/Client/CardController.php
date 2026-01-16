@@ -87,6 +87,23 @@ class CardController extends Controller
             return back()->with('error', 'This package is not available.');
         }
         
+        // Validate card colors are from available package colors
+        $availableColors = $package->getAvailableCardColors();
+        if (!empty($availableColors)) {
+            // Check individual card colors
+            if (isset($validated['cards'])) {
+                foreach ($validated['cards'] as $index => $card) {
+                    if (!in_array($card['card_color'], $availableColors)) {
+                        return back()->withErrors(['cards.' . $index . '.card_color' => 'Selected color is not available for this package.'])->withInput();
+                    }
+                }
+            }
+            // Check bulk color
+            if (isset($validated['bulk']['card_color']) && !in_array($validated['bulk']['card_color'], $availableColors)) {
+                return back()->withErrors(['bulk.card_color' => 'Selected color is not available for this package.'])->withInput();
+            }
+        }
+        
         // Determine if using bulk configuration
         $useBulkConfig = isset($validated['bulk']) && !empty($validated['bulk']);
         $quantity = (int) $validated['quantity'];

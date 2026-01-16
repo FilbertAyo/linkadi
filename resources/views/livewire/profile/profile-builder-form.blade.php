@@ -272,6 +272,9 @@ new class extends Component
             }
         }
         
+        // Remember if we're creating new before we change state
+        $wasCreatingNew = $this->isCreatingNew;
+        
         // Create or update profile
         if ($this->profileId) {
             $profile = Auth::user()->profiles()->findOrFail($this->profileId);
@@ -303,7 +306,8 @@ new class extends Component
         $this->dispatch('profile-saved');
         
         // After creating new profile, redirect to package selection to order card
-        if ($this->isCreatingNew) {
+        // Note: We use $wasCreatingNew to check the state BEFORE we changed it above
+        if ($wasCreatingNew) {
             $this->redirect(route('profile.select-package', ['profile' => $profile->id]), navigate: true);
         }
     }
@@ -441,7 +445,7 @@ new class extends Component
                             <x-input-label :value="__('Personal Profile Image')" />
                             <div class="mt-2">
                                 @if ($existing_profile_image || $profile_image)
-                                    <img src="{{ $profile_image ? $profile_image->temporaryUrl() : asset('storage/' . $existing_profile_image) }}" alt="Profile image preview" class="h-32 w-32 object-cover rounded-full border-2 border-gray-300" />
+                                    <img src="{{ $profile_image ? $profile_image->temporaryUrl() : ($existing_profile_image ? asset('storage/' . $existing_profile_image) : '') }}" alt="Profile image preview" class="h-32 w-32 object-cover rounded-full border-2 border-gray-300" />
                                 @endif
                                 <input wire:model="profile_image" type="file" accept="image/*" class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
                                 <x-input-error class="mt-2" :messages="$errors->get('profile_image')" />
@@ -455,7 +459,7 @@ new class extends Component
                             <x-input-label :value="__('Company Logo')" />
                             <div class="mt-2">
                                 @if ($existing_company_logo || $company_logo)
-                                    <img src="{{ $company_logo ? $company_logo->temporaryUrl() : asset('storage/' . $existing_company_logo) }}" alt="Company logo preview" class="h-32 w-32 object-cover rounded-lg border-2 border-gray-300" />
+                                    <img src="{{ $company_logo ? $company_logo->temporaryUrl() : ($existing_company_logo ? asset('storage/' . $existing_company_logo) : '') }}" alt="Company logo preview" class="h-32 w-32 object-cover rounded-lg border-2 border-gray-300" />
                                 @endif
                                 <input wire:model="company_logo" type="file" accept="image/*" class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
                                 <x-input-error class="mt-2" :messages="$errors->get('company_logo')" />
@@ -470,7 +474,7 @@ new class extends Component
                     <x-input-label :value="__('Cover Image (Optional)')" />
                     <div class="mt-2">
                         @if ($existing_cover_image || $cover_image)
-                            <img src="{{ $cover_image ? $cover_image->temporaryUrl() : asset('storage/' . $existing_cover_image) }}" alt="Cover image preview" class="h-32 w-full object-cover rounded-lg border-2 border-gray-300" />
+                            <img src="{{ $cover_image ? $cover_image->temporaryUrl() : ($existing_cover_image ? asset('storage/' . $existing_cover_image) : '') }}" alt="Cover image preview" class="h-32 w-full object-cover rounded-lg border-2 border-gray-300" />
                         @endif
                         <input wire:model="cover_image" type="file" accept="image/*" class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
                         <x-input-error class="mt-2" :messages="$errors->get('cover_image')" />
