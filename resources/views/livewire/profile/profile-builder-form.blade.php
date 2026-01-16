@@ -213,8 +213,13 @@ new class extends Component
             'slug' => $slug,
             'display_mode' => $validated['display_mode'],
             'is_public' => $validated['is_public'] ?? true,
-            'status' => 'draft',
         ];
+        
+        // Only set status to 'draft' for new profiles
+        // For existing profiles, preserve the current status (e.g., paid, published)
+        if ($this->isCreatingNew) {
+            $data['status'] = 'draft';
+        }
         
         // Add fields based on display mode
         if ($this->display_mode === 'personal_only' || $this->display_mode === 'combined') {
