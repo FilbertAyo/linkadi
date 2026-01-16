@@ -1,2 +1,120 @@
-<x-admin-layout> <div class="pt-6"> <div class="mb-6"> <h1 class="text-3xl font-bold text-gray-900">Profile Management</h1> <p class="text-gray-600 mt-2">Manage all user profiles</p> </div> <!-- Search and Filter --> <div class="bg-white shadow rounded-lg p-4 mb-6 border border-gray-200"> <form method="GET" action="{{ route('admin.profiles.index') }}" class="flex gap-4"> <div class="flex-1"> <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by title, slug, email..." class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"> </div> <div class="w-48"> <select name="visibility" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"> <option value="">All Profiles</option> <option value="public" {{ request('visibility') === 'public' ? 'selected' : '' }}>Public</option> <option value="private" {{ request('visibility') === 'private' ? 'selected' : '' }}>Private</option> </select> </div> <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Filter</button> @if(request()->hasAny(['search', 'visibility'])) <a href="{{ route('admin.profiles.index') }}" class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500">Clear</a> @endif </form> </div> <!-- Profiles Table --> <div class="bg-white shadow rounded-lg border border-gray-200 overflow-hidden"> <div class="overflow-x-auto"> <table class="min-w-full divide-y divide-gray-200"> <thead class="bg-gray-50"> <tr> <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th> <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th> <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th> <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th> <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Links</th> <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th> <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th> </tr> </thead> <tbody class="bg-white divide-y divide-gray-200"> @forelse($profiles as $profile) <tr class="hover:bg-gray-50"> <td class="px-6 py-4 whitespace-nowrap"> <div class="text-sm font-medium text-gray-900">{{ $profile->display_name }}</div> <div class="text-sm text-gray-500">{{ $profile->slug }}</div> </td> <td class="px-6 py-4 whitespace-nowrap"> <span class="px-2 py-1 text-xs font-medium rounded-full {{ $profile->isBusiness() ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' }}"> {{ $profile->isBusiness() ? '🏢 Business' : '👤 Individual' }} </span> </td> <td class="px-6 py-4 whitespace-nowrap"> <div class="text-sm text-gray-900">{{ $profile->user->name }}</div> <div class="text-sm text-gray-500">{{ $profile->user->email }}</div> </td> <td class="px-6 py-4 whitespace-nowrap"> <span class="px-2 py-1 text-xs font-medium rounded-full {{ $profile->is_public ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}"> {{ $profile->is_public ? 'Public' : 'Private' }} </span> </td> <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {{ $profile->socialLinks->count() }} </td> <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {{ $profile->created_at->format('M d, Y') }} </td> <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"> <div class="flex justify-end gap-2"> <a href="{{ route('admin.profiles.show', $profile) }}" class="text-indigo-600 hover:text-indigo-900">View</a> @can('update', $profile) <a href="{{ route('admin.profiles.edit', $profile) }}" class="text-blue-600 hover:text-blue-900">Edit</a> @endcan @can('delete', $profile) <form method="POST" action="{{ route('admin.profiles.destroy', $profile) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this profile? This action cannot be undone.');"> @csrf @method('DELETE') <button type="submit" class="text-red-600 hover:text-red-900">Delete</button> </form> @endcan </div> </td> </tr> @empty <tr> <td colspan="7" class="px-6 py-4 text-center text-gray-500">No profiles found</td> </tr> @endforelse </tbody> </table> </div> <div class="px-6 py-4 border-t border-gray-200"> {{ $profiles->links() }} </div> </div> </div>
-</x-admin-layout> 
+<x-admin-layout>
+    <div class="pt-6">
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">Profile Management</h1>
+            <p class="text-gray-600 mt-2">Manage client profiles (admin profiles excluded)</p>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="bg-white shadow rounded-lg p-4 mb-6 border border-gray-200">
+            <form method="GET" action="{{ route('admin.profiles.index') }}" class="flex gap-4">
+                <div class="flex-1">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by title, slug, email..." class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900">
+                </div>
+                <div class="w-48">
+                    <select name="visibility" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900">
+                        <option value="">All Profiles</option>
+                        <option value="public" {{ request('visibility') === 'public' ? 'selected' : '' }}>Public</option>
+                        <option value="private" {{ request('visibility') === 'private' ? 'selected' : '' }}>Private</option>
+                    </select>
+                </div>
+                <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Filter</button>
+                @if(request()->hasAny(['search', 'visibility']))
+                    <a href="{{ route('admin.profiles.index') }}" class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500">Clear</a>
+                @endif
+            </form>
+        </div>
+
+        <!-- Profiles Table -->
+        <div class="bg-white shadow rounded-lg border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visibility</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Links</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($profiles as $profile)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{ $profile->display_name }}</div>
+                                    <div class="text-sm text-gray-500">{{ $profile->slug }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full {{ $profile->isBusiness() ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' }}">
+                                        {{ $profile->isBusiness() ? '🏢 Business' : '👤 Individual' }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ $profile->user->name }}</div>
+                                    <div class="text-sm text-gray-500">{{ $profile->user->email }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-{{ $profile->status_badge_color }}-100 text-{{ $profile->status_badge_color }}-800">
+                                        {{ $profile->status_display }}
+                                    </span>
+                                    @if($profile->expires_at && $profile->isExpiringSoon())
+                                        <div class="text-xs text-orange-600 mt-1">
+                                            ⚠️ Expiring {{ $profile->expires_at->diffForHumans() }}
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full {{ $profile->is_public ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                        {{ $profile->is_public ? '🌐 Public' : '🔒 Private' }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $profile->socialLinks->count() }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $profile->created_at->format('M d, Y') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex justify-end gap-2">
+                                        <a href="{{ route('admin.profiles.show', $profile) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                                        @can('update', $profile)
+                                            <a href="{{ route('admin.profiles.edit', $profile) }}" class="text-blue-600 hover:text-blue-900">Edit</a>
+                                        @endcan
+                                        @can('delete', $profile)
+                                            <form method="POST" action="{{ route('admin.profiles.destroy', $profile) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this profile? This action cannot be undone.');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                                            </form>
+                                        @endcan
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="px-6 py-8 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                        </svg>
+                                        <p class="text-gray-500 font-medium">No client profiles found</p>
+                                        <p class="text-gray-400 text-sm mt-1">Profiles will appear here when clients create them</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            @if($profiles->hasPages())
+                <div class="px-6 py-4 border-t border-gray-200">
+                    {{ $profiles->links() }}
+                </div>
+            @endif
+        </div>
+    </div>
+</x-admin-layout>

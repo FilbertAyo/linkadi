@@ -18,6 +18,15 @@ class ProfileController extends Controller
 
         $query = Profile::with(['user', 'socialLinks'])->latest();
 
+        // Filter to only show profiles of clients (not admin or moderator)
+        $query->whereHas('user', function ($userQuery) {
+            $userQuery->where(function ($q) {
+                $q->whereHas('roles', function ($roleQ) {
+                    $roleQ->where('name', 'client');
+                })->orWhereDoesntHave('roles');
+            });
+        });
+
         // Search functionality
         if ($request->has('search') && $request->search) {
             $search = $request->search;
@@ -81,7 +90,7 @@ class ProfileController extends Controller
 
         $oldValues = $profile->only([
             'title', 'company', 'bio', 'phone', 'email', 
-            'website', 'address', 'is_public'
+            'website', 'address', 'is_public', 'status'
         ]);
 
         $validated = $request->validate([
@@ -93,13 +102,24 @@ class ProfileController extends Controller
             'website' => ['nullable', 'url', 'max:255'],
             'address' => ['nullable', 'string', 'max:500'],
             'is_public' => ['boolean'],
+            'status' => ['nullable', 'string', 'in:draft,ready,pending_payment,paid,published,expired,suspended'],
         ]);
+
+        // Handle status change to published
+        if (isset($validated['status']) && $validated['status'] === 'published' && $profile->status !== 'published') {
+            $validated['published_at'] = $validated['published_at'] ?? now();
+            
+            // Set expiration date if not already set (default 12 months)
+            if (!$profile->expires_at) {
+                $validated['expires_at'] = now()->addMonths(12);
+            }
+        }
 
         $profile->update($validated);
 
         $newValues = $profile->fresh()->only([
             'title', 'company', 'bio', 'phone', 'email', 
-            'website', 'address', 'is_public'
+            'website', 'address', 'is_public', 'status'
         ]);
 
         // Audit log
