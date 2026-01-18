@@ -1,0 +1,60 @@
+================================================================================
+FIX COMPANY LOGO & COVER IMAGE NOT DISPLAYING
+================================================================================
+
+QUICK FIX - Copy and paste these commands:
+
+cd ~
+
+# 1. Ensure directories exist
+mkdir -p public_html/storage/company-logos
+mkdir -p public_html/storage/cover-images
+
+# 2. Set correct permissions
+chmod -R 775 public_html/storage/company-logos
+chmod -R 775 public_html/storage/cover-images
+
+# 3. Copy any misplaced files
+cp -R linkadi-web/public/storage/company-logos/* public_html/storage/company-logos/ 2>/dev/null || true
+cp -R linkadi-web/public/storage/cover-images/* public_html/storage/cover-images/ 2>/dev/null || true
+
+# 4. Clear cache
+cd linkadi-web && php artisan config:clear && php artisan cache:clear && cd ~
+
+# 5. Check what files you have
+echo "Company logos:"
+ls -la public_html/storage/company-logos/
+
+echo ""
+echo "Cover images:"
+ls -la public_html/storage/cover-images/
+
+================================================================================
+THEN TEST:
+================================================================================
+
+1. Go to your profile page
+2. Hard refresh browser: Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac)
+3. Check if images display
+
+If still not showing:
+- Upload NEW company logo and cover image
+- They should work now
+
+================================================================================
+AUTOMATED OPTION:
+================================================================================
+
+chmod +x fix-missing-images.sh
+./fix-missing-images.sh
+
+================================================================================
+DIAGNOSTIC:
+================================================================================
+
+If you want to see detailed information about what's wrong:
+
+chmod +x check-uploaded-files.sh
+./check-uploaded-files.sh
+
+================================================================================
