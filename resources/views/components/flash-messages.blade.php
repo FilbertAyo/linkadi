@@ -3,7 +3,7 @@
 {{-- Flash Messages Component --}}
 <div x-data="flashMessages()" 
      @flash-message.window="addMessage($event.detail)"
-     class="fixed {{ $position === 'top-right' ? 'top-4 right-4' : ($position === 'top-left' ? 'top-4 left-4' : ($position === 'bottom-right' ? 'bottom-4 right-4' : 'bottom-4 left-4')) }} z-50 space-y-3 max-w-md">
+     class="fixed {{ $position === 'top-right' ? 'top-4 right-4' : ($position === 'top-left' ? 'top-4 left-4' : ($position === 'bottom-right' ? 'bottom-4 right-4' : 'bottom-4 left-4')) }} z-[9999] space-y-3 max-w-md">
     
     {{-- Success Message --}}
     @if (session('success'))

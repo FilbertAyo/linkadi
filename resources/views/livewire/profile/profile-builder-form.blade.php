@@ -307,7 +307,7 @@ new class extends Component
             }
         }
         
-        session()->flash('status', 'Profile saved successfully!');
+        session()->flash('success', 'Profile saved successfully!');
         $this->dispatch('profile-saved');
         
         // After creating new profile, redirect to package selection to order card
@@ -338,7 +338,7 @@ new class extends Component
         
         $profile->delete();
         
-        session()->flash('status', 'Profile deleted successfully!');
+        session()->flash('success', 'Profile deleted successfully!');
         $this->redirect(route('profile.builder.index'), navigate: true);
     }
     
