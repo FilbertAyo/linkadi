@@ -9,9 +9,10 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-class SendWelcomeEmail implements ShouldQueue
+class SendWelcomeEmail
 {
-    use InteractsWithQueue;
+    // Removed ShouldQueue to send emails immediately
+    // use InteractsWithQueue;
 
     /**
      * Create the event listener.
