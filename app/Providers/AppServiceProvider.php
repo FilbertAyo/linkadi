@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Listeners\SendWelcomeEmail;
 use App\Models\Profile;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +24,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register event listeners
+        Event::listen(
+            Registered::class,
+            SendWelcomeEmail::class,
+        );
+
         // Auto-create primary profile when user is created
         User::created(function (User $user) {
             if ($user->profiles()->count() === 0) {

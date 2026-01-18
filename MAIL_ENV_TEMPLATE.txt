@@ -1,0 +1,36 @@
+# ============================================
+# MAIL CONFIGURATION FOR LINKADI
+# ============================================
+# Copy these lines to your .env file and update with your actual credentials
+
+MAIL_MAILER=smtp
+MAIL_HOST=mail.linkadi.co.tz
+MAIL_PORT=465
+MAIL_USERNAME=noreply@linkadi.co.tz
+MAIL_PASSWORD=your_email_password_here
+MAIL_ENCRYPTION=ssl
+MAIL_FROM_ADDRESS=noreply@linkadi.co.tz
+MAIL_FROM_NAME="${APP_NAME}"
+
+# ============================================
+# QUEUE CONFIGURATION (REQUIRED FOR EMAILS)
+# ============================================
+QUEUE_CONNECTION=database
+
+# ============================================
+# INSTRUCTIONS
+# ============================================
+# 1. Create email account "noreply@linkadi.co.tz" in your cPanel
+# 2. Replace "your_email_password_here" with the actual password
+# 3. Make sure APP_URL is set correctly in your .env
+# 4. Run: php artisan queue:table (if not done)
+# 5. Run: php artisan migrate
+# 6. Run: php artisan queue:work (to process email queue)
+# 7. Test by registering a new user
+
+# ============================================
+# FOR DEVELOPMENT/TESTING
+# ============================================
+# To avoid sending real emails during development, use:
+# MAIL_MAILER=log
+# Emails will be logged to storage/logs/laravel.log instead
