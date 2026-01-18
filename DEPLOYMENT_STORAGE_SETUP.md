@@ -4,13 +4,24 @@ This guide shows how to set up Laravel storage on cPanel shared hosting without 
 
 ## Server Structure
 ```
-/home/your-username/
+/home/linkadic/
 ├── linkadi-web/          # Laravel application
 └── public_html/          # Public web root
     └── storage/          # Public storage (we'll create this)
 ```
 
-## Setup Steps
+## Quick Setup (Recommended)
+
+Upload `setup-storage-complete.sh` to your server and run:
+
+```bash
+chmod +x setup-storage-complete.sh
+./setup-storage-complete.sh
+```
+
+This does everything automatically! ✨
+
+## Manual Setup Steps
 
 ### 1. Create Storage Directory in public_html
 
@@ -36,16 +47,46 @@ cp -R linkadi-web/storage/app/public/* public_html/storage/
 - `packages/`
 - `qr-codes/`
 
-### 3. Set Proper Permissions
+### 3. Set Proper Permissions (IMPORTANT!)
+
+The web server needs **write permissions** to save uploaded files.
+
+**Option A: Using the fix script (Recommended)**
 
 ```bash
-chmod -R 755 public_html/storage
-chown -R your-username:your-username public_html/storage
+# Upload fix-storage-permissions.sh to your server, then:
+chmod +x fix-storage-permissions.sh
+./fix-storage-permissions.sh
 ```
 
-Or if using cPanel File Manager:
-- Right-click `storage` folder → Permissions
-- Set to `755` (drwxr-xr-x)
+**Option B: Manual setup**
+
+```bash
+# Create all subdirectories
+mkdir -p public_html/storage/profile-images
+mkdir -p public_html/storage/company-logos
+mkdir -p public_html/storage/cover-images
+mkdir -p public_html/storage/packages
+mkdir -p public_html/storage/qr-codes
+
+# Set permissions to 775 (allows web server to write)
+chmod -R 775 public_html/storage
+
+# Set ownership
+chown -R linkadic:linkadic public_html/storage
+```
+
+**Option C: Using cPanel File Manager**
+
+1. Navigate to `public_html/storage`
+2. Right-click → Permissions
+3. Set to `775` (rwxrwxr-x)
+4. Check "Recurse into subdirectories"
+5. Click "Change Permissions"
+
+**Why 775 instead of 755?**
+- `755` = Owner can write, but web server cannot
+- `775` = Owner AND group can write (web server can save files)
 
 ### 4. Clear Laravel Config Cache
 
@@ -115,12 +156,40 @@ $url = Storage::disk('public')->url($profile->profile_image);
 
 ## Troubleshooting
 
+### Images not uploading or saving?
+
+**This is a PERMISSIONS issue!** The web server cannot write to the directory.
+
+1. **Check current permissions:**
+   ```bash
+   ls -la public_html/storage/
+   # Should show: drwxrwxr-x (775) NOT drwxr-xr-x (755)
+   ```
+
+2. **Fix permissions:**
+   ```bash
+   chmod -R 775 public_html/storage
+   ```
+
+3. **Test write access:**
+   ```bash
+   # Try creating a test file
+   touch public_html/storage/test.txt
+   # If this fails, you have permission issues
+   ```
+
+4. **Check web server logs:**
+   ```bash
+   tail -f linkadi-web/storage/logs/laravel.log
+   # Look for "Permission denied" errors
+   ```
+
 ### Images not showing?
 
 1. **Check permissions:**
    ```bash
    ls -la public_html/storage/
-   # Should show: drwxr-xr-x
+   # Should show: drwxrwxr-x (775)
    ```
 
 2. **Verify files exist:**
@@ -137,6 +206,22 @@ $url = Storage::disk('public')->url($profile->profile_image);
    ```bash
    php artisan config:clear
    ```
+
+### Old images show, but new uploads don't save?
+
+**This means:**
+- ✅ Configuration is correct (old images display)
+- ❌ Permissions are wrong (can't write new files)
+
+**Fix:**
+```bash
+# Set write permissions
+chmod -R 775 public_html/storage
+
+# Verify it worked
+ls -la public_html/storage/
+# Look for: drwxrwxr-x (the middle 'w' is crucial!)
+```
 
 ### Getting 404 errors?
 

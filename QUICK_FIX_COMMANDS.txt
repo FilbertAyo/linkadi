@@ -1,0 +1,53 @@
+================================================================================
+QUICK FIX - Copy and paste these commands into your SSH terminal
+================================================================================
+
+# Fix permissions (this is what you're missing!)
+chmod -R 775 public_html/storage
+
+# Clear Laravel cache
+cd linkadi-web && php artisan config:clear && php artisan cache:clear && cd ~
+
+# Verify it worked
+ls -la public_html/storage/ | head -5
+
+================================================================================
+That's it! Now try uploading an image again.
+================================================================================
+
+If you see "drwxrwxr-x" in the output, it's fixed! ✅
+If you see "drwxr-xr-x" (no 'w' in middle), run chmod again.
+
+================================================================================
+COMPLETE SETUP (if starting fresh)
+================================================================================
+
+# Create directories
+mkdir -p public_html/storage/{profile-images,company-logos,cover-images,packages,qr-codes}
+
+# Copy existing files
+cp -R linkadi-web/storage/app/public/* public_html/storage/ 2>/dev/null || true
+
+# Set permissions (775 not 755!)
+chmod -R 775 public_html/storage
+
+# Set ownership
+chown -R linkadic:linkadic public_html/storage
+
+# Clear cache
+cd linkadi-web && php artisan config:clear && php artisan cache:clear && cd ~
+
+# Test write access
+touch public_html/storage/test.txt && rm public_html/storage/test.txt && echo "✅ Write test passed!"
+
+================================================================================
+DIAGNOSTIC COMMAND
+================================================================================
+
+# Check current permissions
+stat -c "%a %n" public_html/storage 2>/dev/null || stat -f "%A %N" public_html/storage
+
+# Should output: 775 public_html/storage
+# If it shows 755, that's your problem!
+
+================================================================================

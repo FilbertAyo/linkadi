@@ -1,0 +1,290 @@
+================================================================================
+                    LINKADI STORAGE FIX - VISUAL GUIDE
+================================================================================
+
+                            YOUR PROBLEM
+                            ============
+
+    ┌─────────────────────────────────────────────────────────┐
+    │  Old images show ✅                                      │
+    │  (after copying from linkadi-web/storage/app/public/)   │
+    └─────────────────────────────────────────────────────────┘
+                                 BUT
+    ┌─────────────────────────────────────────────────────────┐
+    │  New uploads don't save ❌                               │
+    │  (when you try to update/change image)                  │
+    └─────────────────────────────────────────────────────────┘
+
+
+                            THE CAUSE
+                            =========
+
+    You used permission 755, but web server needs 775 to write!
+
+    ┌──────────────────────┐         ┌──────────────────────┐
+    │   755 (WRONG)        │         │   775 (CORRECT)      │
+    │                      │         │                      │
+    │   drwxr-xr-x         │         │   drwxrwxr-x         │
+    │        ↑             │         │        ↑             │
+    │   No 'w' here!       │         │   Has 'w' here!      │
+    │   Web server         │         │   Web server         │
+    │   can't write ❌     │         │   can write ✅       │
+    └──────────────────────┘         └──────────────────────┘
+
+
+                            THE SOLUTION
+                            ============
+
+    Run ONE command on your server:
+
+    ┌─────────────────────────────────────────────────────────┐
+    │  chmod -R 775 public_html/storage                       │
+    └─────────────────────────────────────────────────────────┘
+
+    That's it! Problem solved! 🎉
+
+
+================================================================================
+                        STEP-BY-STEP INSTRUCTIONS
+================================================================================
+
+OPTION 1: QUICK FIX (30 seconds)
+─────────────────────────────────
+
+1. SSH into your server:
+   
+   ssh linkadic@your-server.com
+
+2. Run these commands:
+
+   chmod -R 775 public_html/storage
+   cd linkadi-web && php artisan config:clear && cd ~
+
+3. Test upload - DONE! ✅
+
+
+OPTION 2: COMPLETE SETUP (5 minutes)
+─────────────────────────────────────
+
+1. SSH into your server:
+   
+   ssh linkadic@your-server.com
+
+2. Copy and paste these commands:
+
+   cd ~
+   mkdir -p public_html/storage/{profile-images,company-logos,cover-images,packages,qr-codes}
+   cp -R linkadi-web/storage/app/public/* public_html/storage/ 2>/dev/null || true
+   chmod -R 775 public_html/storage
+   chown -R linkadic:linkadic public_html/storage
+   cd linkadi-web && php artisan config:clear && php artisan cache:clear && cd ~
+
+3. Test upload - DONE! ✅
+
+
+OPTION 3: AUTOMATED SCRIPT (easiest)
+─────────────────────────────────────
+
+1. Upload RUN_THESE_COMMANDS.sh to your server
+
+2. SSH into your server:
+   
+   ssh linkadic@your-server.com
+
+3. Run the script:
+
+   chmod +x RUN_THESE_COMMANDS.sh
+   ./RUN_THESE_COMMANDS.sh
+
+4. Test upload - DONE! ✅
+
+
+================================================================================
+                            VERIFICATION
+================================================================================
+
+After running the fix, verify it worked:
+
+1. Check permissions:
+   
+   ls -ld public_html/storage/
+   
+   ✅ Should show: drwxrwxr-x (note the 'w' in the middle!)
+   ❌ If shows: drwxr-xr-x (run chmod again)
+
+
+2. Test write access:
+   
+   touch public_html/storage/test.txt
+   
+   ✅ If succeeds: Permissions are correct!
+   ❌ If fails: Run chmod -R 775 public_html/storage again
+
+
+3. Test on website:
+   
+   a. Go to: https://linkadi.co.tz
+   b. Navigate to profile builder
+   c. Upload a profile image
+   d. Click save
+   
+   ✅ Image displays immediately: SUCCESS!
+   ❌ Image doesn't show: Run diagnose-storage.sh
+
+
+================================================================================
+                        WHAT HAPPENS NOW
+================================================================================
+
+BEFORE FIX (755 permissions):
+─────────────────────────────
+
+    User uploads image
+         ↓
+    Laravel tries to save
+         ↓
+    Permission check: 755
+         ↓
+    Web server can't write ❌
+         ↓
+    Upload fails silently
+         ↓
+    User sees old/no image
+
+
+AFTER FIX (775 permissions):
+────────────────────────────
+
+    User uploads image
+         ↓
+    Laravel tries to save
+         ↓
+    Permission check: 775
+         ↓
+    Web server can write ✅
+         ↓
+    File saved successfully
+         ↓
+    User sees new image! 🎉
+
+
+================================================================================
+                        FILE LOCATIONS
+================================================================================
+
+After setup, your files are stored here:
+
+    /home/linkadic/public_html/storage/
+    ├── profile-images/     (user profile pictures)
+    ├── company-logos/      (company logos)
+    ├── cover-images/       (profile cover images)
+    ├── packages/           (package images - admin)
+    └── qr-codes/           (generated QR codes)
+
+And accessible at these URLs:
+
+    https://linkadi.co.tz/storage/profile-images/filename.jpg
+    https://linkadi.co.tz/storage/company-logos/filename.jpg
+    https://linkadi.co.tz/storage/cover-images/filename.jpg
+    https://linkadi.co.tz/storage/packages/filename.jpg
+    https://linkadi.co.tz/storage/qr-codes/filename.png
+
+
+================================================================================
+                        TROUBLESHOOTING
+================================================================================
+
+PROBLEM: Still can't upload
+SOLUTION: Check permissions
+
+    ls -ld public_html/storage/
+    
+    If shows drwxr-xr-x (755):
+        chmod -R 775 public_html/storage
+
+
+PROBLEM: Subdirectories missing
+SOLUTION: Create them
+
+    mkdir -p public_html/storage/{profile-images,company-logos,cover-images,packages,qr-codes}
+
+
+PROBLEM: Cache not cleared
+SOLUTION: Clear it
+
+    cd linkadi-web
+    php artisan config:clear
+    php artisan cache:clear
+
+
+PROBLEM: Still not working
+SOLUTION: Run diagnostic
+
+    chmod +x diagnose-storage.sh
+    ./diagnose-storage.sh
+
+
+================================================================================
+                        HELPFUL FILES
+================================================================================
+
+📄 START_HERE.md
+   → Main entry point, read this first
+
+📄 QUICK_FIX_COMMANDS.txt
+   → Copy-paste commands for instant fix
+
+📄 UNDERSTANDING_THE_PROBLEM.md
+   → Visual explanation of why this happens
+
+📄 README_STORAGE_SETUP.md
+   → Complete documentation
+
+🔧 RUN_THESE_COMMANDS.sh
+   → Automated fix script
+
+🔧 diagnose-storage.sh
+   → Diagnostic tool to identify issues
+
+📋 DEPLOYMENT_CHECKLIST.md
+   → Step-by-step deployment checklist
+
+
+================================================================================
+                        QUICK REFERENCE
+================================================================================
+
+Fix permissions:        chmod -R 775 public_html/storage
+Clear cache:            cd linkadi-web && php artisan config:clear
+Check permissions:      ls -ld public_html/storage/
+Test write:             touch public_html/storage/test.txt
+Run diagnostic:         ./diagnose-storage.sh
+View logs:              tail -f linkadi-web/storage/logs/laravel.log
+
+
+================================================================================
+                        REMEMBER
+================================================================================
+
+✅ Use 775 (not 755) for web-writable directories
+✅ Clear cache after config changes
+✅ Test all upload features after deployment
+✅ Never use php artisan storage:link with this setup
+
+❌ Don't use 755 (web server can't write)
+❌ Don't use 777 (security risk)
+❌ Don't forget to clear cache
+
+
+================================================================================
+                        YOU'RE READY!
+================================================================================
+
+1. Choose an option above (Quick Fix, Complete Setup, or Automated)
+2. Run the commands on your server
+3. Test uploading an image
+4. Enjoy working uploads! 🎉
+
+Questions? Check START_HERE.md or README_STORAGE_SETUP.md
+
+================================================================================
