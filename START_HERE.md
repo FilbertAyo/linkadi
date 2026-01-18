@@ -9,16 +9,28 @@
 
 You used permission `755` but need `775` for the web server to write files.
 
-## The Solution (30 seconds)
+## The Solution (2 minutes)
 
 SSH into your server and run:
 
 ```bash
+# 1. Create directories
+mkdir -p public_html/storage/{profile-images,company-logos,cover-images,packages,qr-codes}
+
+# 2. Set permissions
 chmod -R 775 public_html/storage
-cd linkadi-web && php artisan config:clear && cd ~
+
+# 3. Add storage path to .env (THIS IS CRITICAL!)
+cd linkadi-web
+echo "PUBLIC_STORAGE_PATH=/home/linkadic/public_html/storage" >> .env
+
+# 4. Clear cache
+php artisan config:clear && php artisan cache:clear
 ```
 
 **That's it!** Try uploading an image now. It should work! ✨
+
+**Why the .env change?** On cPanel, `public_path()` points to `linkadi-web/public/` instead of `public_html/`. The environment variable tells Laravel the correct path.
 
 ## Files in This Folder
 

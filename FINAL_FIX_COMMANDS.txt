@@ -1,0 +1,99 @@
+================================================================================
+FINAL FIX - Copy and Paste These Commands
+================================================================================
+
+The problem: Laravel is saving to linkadi-web/public/storage instead of 
+             public_html/storage because public_path() resolves incorrectly.
+
+The solution: Add an environment variable to tell Laravel the correct path.
+
+================================================================================
+COMMANDS TO RUN ON YOUR SERVER
+================================================================================
+
+# 1. Create directories
+cd ~
+mkdir -p public_html/storage/{profile-images,company-logos,cover-images,packages,qr-codes}
+
+# 2. Set permissions
+chmod -R 775 public_html/storage
+
+# 3. Copy existing files (from wherever they are now)
+cp -R linkadi-web/public/storage/* public_html/storage/ 2>/dev/null || true
+cp -R linkadi-web/storage/app/public/* public_html/storage/ 2>/dev/null || true
+
+# 4. Add storage path to .env (THIS IS THE KEY!)
+cd linkadi-web
+echo "" >> .env
+echo "# Storage path for cPanel" >> .env
+echo "PUBLIC_STORAGE_PATH=/home/linkadic/public_html/storage" >> .env
+
+# 5. Clear cache
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+
+# 6. Verify the path
+php -r "require 'vendor/autoload.php'; \$app = require_once 'bootstrap/app.php'; \$app->make('Illuminate\Contracts\Console\Kernel')->bootstrap(); echo config('filesystems.disks.public.root') . PHP_EOL;"
+
+# Should output: /home/linkadic/public_html/storage
+
+================================================================================
+VERIFICATION
+================================================================================
+
+# Check .env has the variable
+grep PUBLIC_STORAGE_PATH ~/linkadi-web/.env
+
+# Should show:
+# PUBLIC_STORAGE_PATH=/home/linkadic/public_html/storage
+
+# Check permissions
+ls -ld ~/public_html/storage/
+
+# Should show:
+# drwxrwxr-x (775)
+
+# Test write
+touch ~/public_html/storage/test.txt && rm ~/public_html/storage/test.txt && echo "✅ Write OK"
+
+================================================================================
+AUTOMATED OPTION
+================================================================================
+
+Or just upload setup-storage-final.sh and run:
+
+chmod +x setup-storage-final.sh
+./setup-storage-final.sh
+
+================================================================================
+AFTER RUNNING THESE COMMANDS
+================================================================================
+
+1. Go to your website: https://linkadi.co.tz
+2. Upload a profile image
+3. Check where it saved:
+   ls -la ~/public_html/storage/profile-images/
+4. If you see the file there, it worked! ✅
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+If files still go to linkadi-web/public/storage:
+
+1. Make sure .env has the variable:
+   grep PUBLIC_STORAGE_PATH ~/linkadi-web/.env
+
+2. Clear cache again:
+   cd ~/linkadi-web && php artisan config:clear
+
+3. Check config loads correctly:
+   cd ~/linkadi-web
+   php artisan tinker
+   config('filesystems.disks.public.root')
+   exit
+
+   Should show: /home/linkadic/public_html/storage
+
+================================================================================
