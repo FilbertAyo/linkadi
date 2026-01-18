@@ -34,5 +34,9 @@
             </div>
         </div>
     </main>
+
+    <!-- Global Livewire Flash Message Handler -->
+   
+
 </body>
 </html>

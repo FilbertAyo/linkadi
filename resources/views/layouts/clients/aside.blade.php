@@ -1,4 +1,4 @@
-<aside id="sidebar" class="fixed z-30 left-0 top-16 bottom-0 hidden lg:flex flex-shrink-0 flex-col w-64 transition-all duration-300 ease-in-out bg-white border-r border-gray-200 shadow-lg lg:sticky lg:top-0 lg:bottom-auto lg:border lg:rounded-lg lg:shadow-sm lg:self-start" aria-label="Sidebar">
+<aside id="sidebar" class="fixed z-10 left-0 top-16 bottom-0 hidden lg:flex flex-shrink-0 flex-col w-64 transition-all duration-300 ease-in-out bg-white border-r border-gray-200 shadow-lg lg:sticky lg:top-0 lg:bottom-auto lg:border lg:rounded-lg lg:shadow-sm lg:self-start" aria-label="Sidebar">
             <div class="relative flex-1 flex flex-col min-h-0 h-full">
            
                 <div class="px-6 py-4 border-b border-gray-200">

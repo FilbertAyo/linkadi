@@ -35,6 +35,7 @@ new class extends Component
         $this->reset('current_password', 'password', 'password_confirmation');
 
         $this->dispatch('password-updated');
+        $this->dispatch('flash-message', message: 'Password updated successfully!', type: 'success');
     }
 }; ?>
 

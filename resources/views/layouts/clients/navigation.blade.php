@@ -1,4 +1,4 @@
-<header class="fixed w-full z-50 top-0">
+<header class="fixed w-full z-20 top-0">
         <nav class="bg-white border-b border-gray-200 py-2.5">
             <div class="flex flex-wrap items-center justify-between max-w-screen-xl px-4 mx-auto">
                 <a href="{{ route('welcome') }}" class="flex items-center">

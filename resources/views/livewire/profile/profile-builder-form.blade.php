@@ -307,12 +307,13 @@ new class extends Component
             }
         }
         
-        session()->flash('success', 'Profile saved successfully!');
         $this->dispatch('profile-saved');
+        $this->dispatch('flash-message', message: 'Profile saved successfully!', type: 'success');
         
         // After creating new profile, redirect to package selection to order card
         // Note: We use $wasCreatingNew to check the state BEFORE we changed it above
         if ($wasCreatingNew) {
+            session()->flash('success', 'Profile saved successfully!');
             $this->redirect(route('profile.select-package', ['profile' => $profile->id]), navigate: true);
         }
     }
