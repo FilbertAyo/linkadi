@@ -1,0 +1,186 @@
+================================================================================
+EMERGENCY FIX - YOUR CONFIG FILE MIGHT NOT BE DEPLOYED
+================================================================================
+
+The problem: Images are saving to linkadi-web/public/storage/ instead of 
+public_html/storage/. This means the server still has the OLD config file.
+
+SOLUTION 1: Check if config is updated on server
+================================================================================
+
+SSH into your server and run:
+
+    grep "public_path('storage')" ~/linkadi-web/config/filesystems.php
+
+Expected result: Should show a line with public_path('storage')
+
+If it shows NOTHING or shows storage_path('app/public'):
+    → Your config file is NOT updated on the server!
+    → You need to upload the new config/filesystems.php
+
+
+SOLUTION 2: Quick fix - Update config directly on server
+================================================================================
+
+SSH into your server and run these commands:
+
+    cd ~/linkadi-web/config
+    
+    # Backup current config
+    cp filesystems.php filesystems.php.backup
+    
+    # Edit the file (use nano or vi)
+    nano filesystems.php
+
+Find this line (around line 43):
+
+    'root' => storage_path('app/public'),
+
+Change it to:
+
+    'root' => public_path('storage'),
+
+Save and exit (Ctrl+X, then Y, then Enter in nano)
+
+Then run:
+
+    cd ~/linkadi-web
+    php artisan config:clear
+    php artisan cache:clear
+    php artisan optimize:clear
+
+
+SOLUTION 3: Move existing files and remove old directory
+================================================================================
+
+After updating the config, run:
+
+    cd ~
+    
+    # Move any files from old location to new location
+    cp -R linkadi-web/public/storage/* public_html/storage/ 2>/dev/null || true
+    
+    # Remove the old storage directory
+    rm -rf linkadi-web/public/storage
+    
+    # Set correct permissions
+    chmod -R 775 public_html/storage
+    
+    # Clear cache again
+    cd linkadi-web && php artisan config:clear && php artisan cache:clear
+
+
+SOLUTION 4: Use the automated script
+================================================================================
+
+Upload FIX_NOW.sh to your server and run:
+
+    chmod +x FIX_NOW.sh
+    ./FIX_NOW.sh
+
+
+VERIFICATION
+================================================================================
+
+After fixing, verify the config is correct:
+
+    # Check config file
+    grep "public_path" ~/linkadi-web/config/filesystems.php
+    
+    # Should show:
+    #   'root' => public_path('storage'),
+
+    # Check that old directory is gone
+    ls ~/linkadi-web/public/storage
+    
+    # Should show:
+    #   ls: cannot access ... No such file or directory
+
+    # Check new directory exists
+    ls ~/public_html/storage/
+    
+    # Should show:
+    #   profile-images  company-logos  cover-images  packages  qr-codes
+
+
+TEST UPLOAD
+================================================================================
+
+1. Go to https://linkadi.co.tz
+2. Upload a profile image
+3. After saving, check:
+
+    ls -la ~/public_html/storage/profile-images/
+    
+    # Should show the newly uploaded file
+
+If file appears in public_html/storage/ → SUCCESS! ✅
+If file appears in linkadi-web/public/storage/ → Config still wrong ❌
+
+
+QUICK DIAGNOSTIC COMMAND
+================================================================================
+
+Run this to see exactly where files are going:
+
+    echo "=== Config Check ==="
+    grep "'root' =>" ~/linkadi-web/config/filesystems.php | grep public
+    echo ""
+    echo "=== Files in old location ==="
+    ls -la ~/linkadi-web/public/storage/ 2>/dev/null || echo "Directory doesn't exist (GOOD)"
+    echo ""
+    echo "=== Files in new location ==="
+    ls -la ~/public_html/storage/ 2>/dev/null || echo "Directory doesn't exist (BAD)"
+
+
+UNDERSTANDING THE ISSUE
+================================================================================
+
+Your server structure:
+    
+    /home/linkadic/
+    ├── linkadi-web/
+    │   ├── public/              ← Probably symlinked to public_html
+    │   │   └── storage/         ← Files are saving HERE (wrong!)
+    │   └── config/
+    │       └── filesystems.php  ← This file might not be updated
+    │
+    └── public_html/             ← The actual web root
+        └── storage/             ← Files should save HERE (correct!)
+
+When public_path('storage') is called:
+- It resolves to: /home/linkadic/linkadi-web/public/storage
+- But we want: /home/linkadic/public_html/storage
+
+The solution:
+1. Make sure config file has public_path('storage')
+2. Remove linkadi-web/public/storage directory
+3. Ensure public_html/storage exists with 775 permissions
+
+
+STILL NOT WORKING?
+================================================================================
+
+If after all this it still doesn't work, run:
+
+    cd ~/linkadi-web
+    php -r "echo public_path('storage') . PHP_EOL;"
+
+This will show you exactly where Laravel thinks the storage path is.
+
+Expected: /home/linkadic/public_html/storage
+If different: There might be a path configuration issue
+
+
+NEED MORE HELP?
+================================================================================
+
+Send me the output of these commands:
+
+    cd ~
+    pwd
+    ls -la | grep public
+    grep "public_path" linkadi-web/config/filesystems.php
+    php -r "require 'linkadi-web/vendor/autoload.php'; echo public_path('storage');"
+
+================================================================================
