@@ -38,16 +38,16 @@
             <input type="hidden" name="quantity" id="hiddenQuantity" value="1">
 
             <div class="space-y-6">
-                <!-- Subscription Duration Selector -->
+                <!-- Subscription Duration Selector (1 year only - 2 and 3 year options removed) -->
                 @php
-                    $subscriptionOptions = $package->getSubscriptionOptions();
+                    $subscriptionOptions = collect($package->getSubscriptionOptions())->where('years', 1)->values()->all();
                 @endphp
 
-                @if($package->enable_multi_year_subscriptions && count($subscriptionOptions) > 1)
+                @if($package->enable_multi_year_subscriptions && count($subscriptionOptions) >= 1)
                     <div class="bg-white shadow-sm rounded-lg border border-gray-200 p-6">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Choose Subscription Duration</h3>
-                        <p class="text-sm text-gray-500 mb-4">Save more by subscribing for multiple years upfront!</p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <p class="text-sm text-gray-500 mb-4">1 year subscription included.</p>
+                        <div class="grid grid-cols-1 gap-4">
                             @foreach($subscriptionOptions as $index => $option)
                                 <label class="relative flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-brand-400 subscription-option {{ $option['years'] === 1 ? 'border-brand-500 bg-brand-50' : 'border-gray-300' }}" data-years="{{ $option['years'] }}" data-price="{{ $option['price'] }}">
                                     <input type="radio" name="subscription_years" value="{{ $option['years'] }}" {{ $option['years'] === 1 ? 'checked' : '' }} class="sr-only subscription-radio" onchange="updateSubscriptionSelection({{ $option['years'] }}, {{ $option['price'] }})">
@@ -188,7 +188,7 @@
     <!-- Initialize with Blade data -->
     <script>
         @php
-            $subscriptionOptions = $package->getSubscriptionOptions();
+            $subscriptionOptions = collect($package->getSubscriptionOptions())->where('years', 1)->values()->all();
         @endphp
         
         if (typeof initCardCheckout === 'function') {
