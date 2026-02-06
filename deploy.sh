@@ -130,6 +130,15 @@ chmod -R 755 "$PUBLIC_HTML_DIR/images" 2>/dev/null || print_warning "Could not s
 
 print_message "✓ Images synced successfully"
 
+# Step 4.5: Sync JavaScript files (important for card-checkout.js)
+print_message "Step 4.5: Ensuring JavaScript files are up to date..."
+if [ -f "$PROJECT_DIR/public/js/card-checkout.js" ]; then
+    print_message "  - card-checkout.js file exists and will be served from public/js/"
+    print_message "  - Make sure this file is accessible via web server"
+else
+    print_warning "  - card-checkout.js not found in public/js/"
+fi
+
 # Step 5: Final optimizations
 print_message "Step 5: Running final optimizations..."
 

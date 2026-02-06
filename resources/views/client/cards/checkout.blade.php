@@ -183,7 +183,7 @@
     </div>
 
     <!-- External JavaScript -->
-    <script src="{{ asset('js/card-checkout.js') }}"></script>
+    <script src="{{ asset('js/card-checkout.js') }}?v={{ filemtime(public_path('js/card-checkout.js')) }}"></script>
     
     <!-- Initialize with Blade data -->
     <script>
