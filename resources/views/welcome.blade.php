@@ -229,23 +229,10 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="white">
-        <div class="max-w-screen-xl px-4 py-8 mx-auto lg:py-16 lg:px-6">
-            <div class="max-w-screen-sm mx-auto text-center">
-                <h2 class="mb-4 text-3xl font-extrabold leading-tight tracking-tight text-gray-900">Ready to create your digital identity?</h2>
-                <p class="mb-6 font-light text-gray-500 md:text-lg">Join Linkadi today and get your NFC card. No credit card required to start.</p>
-                @auth
-                <a href="{{ route('dashboard') }}" class="text-white bg-brand-600 hover:bg-brand-700 focus:ring-4 focus:ring-brand-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 focus:outline-none">Go to Dashboard</a>
-                @else
-                <a href="{{ route('register') }}" class="text-white bg-brand-600 hover:bg-brand-700 focus:ring-4 focus:ring-brand-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 focus:outline-none">Get Started Free</a>
-                @endauth
-            </div>
-        </div>
-    </section>
+
 
     <!-- FAQ Section -->
-    <section id="faq" class="bg-gray-50 pt-16">
+    <section id="faq" class="white mt-3">
         <div class="max-w-screen-xl px-4 pb-8 mx-auto lg:pb-24 lg:px-6">
             <h2 class="mb-6 text-3xl font-extrabold tracking-tight text-center text-gray-900 lg:mb-8 lg:text-3xl">Frequently asked questions</h2>
             <div class="max-w-screen-md mx-auto">
