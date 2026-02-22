@@ -19,21 +19,19 @@
                 </div>
                 <div class="items-center justify-between hidden w-full lg:flex lg:w-auto lg:order-1" id="mobile-menu-2">
                     <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
+                   
                         <li>
-                            <a href="/#home" class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-brand-600 lg:p-0">Home</a>
+                        <x-nav-link href="/#features">Features</x-nav-link>
                         </li>
                         <li>
-                            <a href="/#features" class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-brand-600 lg:p-0">Features</a>
+                        <x-nav-link href="/#how-it-works">How it Works</x-nav-link>
                         </li>
                         <li>
-                            <a href="/#how-it-works" class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-brand-600 lg:p-0">How it Works</a>
-                        </li>
-                        <li>
-                            <a href="/#packages" class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-brand-600 lg:p-0">Packages</a>
+                        <x-nav-link href="/#packages">Packages</x-nav-link>
                         </li>
                        
                         <li>
-                            <a href="/#faq" class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-brand-600 lg:p-0">FAQ</a>
+                        <x-nav-link href="/#faq">FAQ</x-nav-link>
                         </li>
                     </ul>
                 </div>

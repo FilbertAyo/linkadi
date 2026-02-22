@@ -13,6 +13,72 @@ use Spatie\Permission\Models\Role;
 class UserController extends Controller
 {
     /**
+     * Display a listing of admin and moderator users.
+     */
+    public function adminsIndex(Request $request)
+    {
+        $this->authorize('viewAny', User::class);
+
+        $query = User::with('roles')->whereHas('roles', function ($q) {
+            $q->whereIn('name', ['admin', 'moderator']);
+        });
+
+        // Search functionality
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by role
+        if ($request->has('role') && $request->role && in_array($request->role, ['admin', 'moderator'])) {
+            $query->role($request->role);
+        }
+
+        $admins = $query->latest()->paginate(15)->withQueryString();
+        $roles = Role::whereIn('name', ['admin', 'moderator'])->get();
+
+        return view('admin.admins.index', compact('admins', 'roles'));
+    }
+
+    /**
+     * Display a listing of client users.
+     */
+    public function clientsIndex(Request $request)
+    {
+        $this->authorize('viewAny', User::class);
+
+        $query = User::with('roles')->where(function ($q) {
+            $q->whereHas('roles', function ($roleQ) {
+                $roleQ->where('name', 'client');
+            })->orWhereDoesntHave('roles');
+        });
+
+        // Search functionality
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by role (only client role applies here)
+        if ($request->has('role') && $request->role && $request->role === 'client') {
+            $query->whereHas('roles', function ($q) {
+                $q->where('name', 'client');
+            });
+        }
+
+        $clients = $query->latest()->paginate(15)->withQueryString();
+        $roles = Role::where('name', 'client')->get();
+
+        return view('admin.clients.index', compact('clients', 'roles'));
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)

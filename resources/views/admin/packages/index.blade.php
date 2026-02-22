@@ -23,31 +23,31 @@
         </div> <!-- Packages Table -->
         <div class="bg-white shadow rounded-lg border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table class="min-w-full border border-gray-300 divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-300">Package</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-300">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-300">Price</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-300">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-300">Order</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200"> @forelse($packages as $package) <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 border-r border-gray-300">
                                 <div class="flex items-center"> @if($package->image) <img src="{{ $package->image_url }}" alt="{{ $package->name }}" class="h-12 w-12 rounded-lg object-cover mr-4"> @else <div class="h-12 w-12 rounded-lg bg-indigo-500 flex items-center justify-center mr-4"> <span class="text-white text-xs font-medium">{{ substr($package->name, 0, 2) }}</span> </div> @endif <div>
                                         <div class="text-sm font-medium text-gray-900">{{ $package->name }}</div>
                                         <div class="text-sm text-gray-500 line-clamp-1">{{ Str::limit($package->description, 50) }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap"> <span class="px-2 py-1 text-xs font-medium rounded-full {{ $package->type === 'nfc_card' ? 'bg-brand-100 text-brand-800' : '' }} {{ $package->type === 'classic' ? 'bg-green-100 text-green-800' : '' }}"> {{ $package->type === 'nfc_card' ? 'NFC Card' : 'Classic Business Cards' }} </span> </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"> @if($package->type === 'classic') @if($package->pricingTiers->isNotEmpty()) <span class="text-xs text-gray-500">From TZS {{ number_format($package->pricingTiers->first()->price_per_unit, 2) }}/unit</span> @else <span class="text-xs text-gray-400">No tiers</span> @endif @else TZS {{ number_format($package->base_price ?? 0, 2) }} @endif </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-6 py-4 whitespace-nowrap border-r border-gray-300"> <span class="px-2 py-1 text-xs font-medium rounded-full {{ $package->type === 'nfc_card' ? 'bg-brand-100 text-brand-800' : '' }} {{ $package->type === 'classic' ? 'bg-green-100 text-green-800' : '' }}"> {{ $package->type === 'nfc_card' ? 'NFC Card' : 'Classic Business Cards' }} </span> </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-r border-gray-300"> @if($package->type === 'classic') @if($package->pricingTiers->isNotEmpty()) <span class="text-xs text-gray-500">From TZS {{ number_format($package->pricingTiers->first()->price_per_unit, 2) }}/unit</span> @else <span class="text-xs text-gray-400">No tiers</span> @endif @else TZS {{ number_format($package->base_price ?? 0, 2) }} @endif </td>
+                            <td class="px-6 py-4 whitespace-nowrap border-r border-gray-300">
                                 <form method="POST" action="{{ route('admin.packages.toggle-active', $package) }}" class="inline"> @csrf <button type="submit" class="px-2 py-1 text-xs font-medium rounded-full {{ $package->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}"> {{ $package->is_active ? 'Active' : 'Inactive' }} </button> </form>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {{ $package->display_order }} </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r border-gray-300"> {{ $package->display_order }} </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex justify-end gap-2"> <a href="{{ route('admin.packages.show', $package) }}" class="text-indigo-600 hover:text-indigo-900">View</a> <a href="{{ route('admin.packages.edit', $package) }}" class="text-brand-600 hover:text-brand-900">Edit</a>
                                     <form method="POST" action="{{ route('admin.packages.destroy', $package) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this package? This action cannot be undone.');"> @csrf @method('DELETE') <button type="submit" class="text-red-600 hover:text-red-900">Delete</button> </form>

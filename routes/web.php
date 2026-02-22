@@ -119,6 +119,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         ->name('dashboard');
     
     Route::resource('users', App\Http\Controllers\Admin\UserController::class);
+    
+    // Separate routes for admins and clients
+    Route::get('/admins', [App\Http\Controllers\Admin\UserController::class, 'adminsIndex'])->name('admins.index');
+    Route::get('/clients', [App\Http\Controllers\Admin\UserController::class, 'clientsIndex'])->name('clients.index');
+    
     Route::resource('profiles', App\Http\Controllers\Admin\ProfileController::class)->except(['create', 'store']);
     
     // Package management routes
